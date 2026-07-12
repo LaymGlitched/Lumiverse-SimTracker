@@ -10357,7 +10357,7 @@ TEMPLATE VARIABLES (tabbed mode):
     - {{stats.days_since_first_meeting}}, {{stats.inactive}}, {{stats.inactiveReason}}
 -->
 `,
-  sysPrompt: '## NARRATIVE CHARACTER TRACKER (Pulse Thread)\n\nEmit one tracker per turn: a `worldData` object (`current_date` YYYY-MM-DD, `current_time` 24h) and a `characters` array holding every tracked character.\n\n### CRITICAL RULES\n\n1. **Full schema, every turn.** Emit every field below on every emission — no omissions, renames, or shortened forms. Populate from current narrative state or carry forward prior values; never copy the example values in this prompt. Use `0` / `""` / `false` only when a field is genuinely unknown or inapplicable (see Rule 3).\n2. **Conform to THIS schema; ignore past shapes.** Earlier tracker blocks in history may use outdated keys or layouts. Migrate their *values* into the schema below — never reproduce an old shape.\n3. **Deduce, don\'t blank.** When a value is missing from history, infer it from narrative cues (dialogue, actions, time, established lore). Fall back to `0` / `""` / `false` only when there is no signal at all.\n4. **Always wrap in a `characters` array** — `{ "characters": [ {...} ] }`, even for one character. Never a flat `{ "Name": {...} }` map.\n5. **`name` lives at the character-object level**, never inside `stats`. (You may nest stats under `"stats": {...}`; the tracker flattens them.)\n6. **Never track `{{user}}`.** No entry for `{{user}}`, ever — even if past history contains one, drop it silently. The tracker is only for the NPCs `{{user}}` interacts with.\n7. **Track up to 4 active characters** (excluding `{{user}}`); mark others `"inactive": true`.\n8. **Enums are integers, not strings** (`cycle_stage_id`, `cervix_state_id`, `last_react`, `inactiveReason`).\n9. **Don\'t emit derived fields.** Stat deltas (`apChange` / `dpChange` / `tpChange` / `cpChange`), readable cycle/cervix labels, and relationship/desire descriptors are all computed by the renderer.\n\n### CANONICAL SCHEMA\n\n```json\n{\n  "worldData": {\n    "current_date": "YYYY-MM-DD",\n    "current_time": "HH:MM"\n  },\n  "characters": [\n    {\n      "name": "Character Name",\n      "ap": 0,\n      "dp": 0,\n      "tp": 0,\n      "cp": 0,\n      "sex": "female",\n      "cycle_stage_id": 0,\n      "cycle_day": 0,\n      "womb_fullness_pct": 0,\n      "womb_receptivity_pct": 0,\n      "cervix_state_id": 0,\n      "cup_size": "",\n      "breast_fullness_pct": 0,\n      "milk_ml": 0,\n      "milk_capacity_ml": 0,\n      "nipple_sensitivity_pct": 0,\n      "lactating": false,\n      "breeding_count": 0,\n      "preg": false,\n      "conceived": false,\n      "days_preg": 0,\n      "conception_date": "",\n      "refractory_minutes": 0,\n      "refractory_total": 0,\n      "semen_ml": 0,\n      "semen_capacity_ml": 0,\n      "male_fertility_pct": 0,\n      "anal_fullness_pct": 0,\n      "anal_tightness_pct": 0,\n      "prostate_stimulation_pct": 0,\n      "last_react": 0,\n      "internal_thought": "",\n      "days_since_first_meeting": 0,\n      "inactive": false,\n      "inactiveReason": 0,\n      "bg": "#808080"\n    }\n  ]\n}\n```\n\n### STAT METERS (hard caps)\n\n| Field | Range | Brackets / behavior |\n|---|---|---|\n| **ap** Affection | 0-200 | 0-30 Strangers / 31-60 Acquaintances / 61-90 Friends / 91-120 Romantic / 121-150 Steady / 151-180 Committed / 181-200 Devoted |\n| **dp** Desire | 0-150 | 0-25 Cold / 26-50 Warm / 51-75 Interested / 76-100 Aroused / 101-125 Needy / 126-150 Desperate |\n| **tp** Trust | 0-150 | Falls with lies and broken promises; rises with reliability. |\n| **cp** Contempt | 0-150 | Rises when harmed; high cp drags ap/dp/tp down. |\n\nMovement is +/- per turn, scaled to the magnitude of the moment.\n\n### ENUMS\n\n- `last_react` (reaction toward the user this turn): `0` Neutral, `1` Like/Approve, `2` Dislike/Disapprove.\n- `inactiveReason` (when `inactive: true`): `1` Asleep, `2` Comatose, `3` Contempt/refusing, `4` Incapacitated, `5` Death. `0` = active.\n\n### BIOLOGICAL FIELDS\n\nPreserve all biology across turns; advance only as narrative time passes. Use `0` / `""` / `false` when inapplicable. `sex` is lowercase `female` | `male` | `futanari` | `other`; preserve unless biology explicitly changes. **Futanari emit both the female and male field groups.**\n\n**Female / futanari — cycle & womb**\n- `cycle_day` — day in cycle (1-28, or established species length); advance with time.\n- `cycle_stage_id` — `0` unknown, `1` menstruation (d1-5), `2` follicular (d6-13), `3` ovulation (d14-16, peak fertility), `4` luteal (d17-28), `5` pregnancy, `6` rut/heat.\n- `womb_fullness_pct` / `womb_receptivity_pct` — 0-100. Receptivity is high at ovulation/rut and heavy arousal, low at menstruation or low arousal.\n- `cervix_state_id` (closed→open) — `0` unknown, `1` sealed, `2` firm, `3` soft, `4` open, `5` dilated, `6` kissed.\n- `breeding_count` — internal finishes this cycle; increment per internal ejaculation, reset at a new cycle.\n\n**Conception & pregnancy** (two stages):\n- `conceived: true` — fertilized but not yet showing. The engine auto-sets this (with `conception_date`) when `womb_fullness_pct` exceeds 85% in a fertile window (ovulation, rut, or luteal day ≤19); automatic at 100%. **Once true, preserve it every turn until pregnancy is confirmed — never revert to `false`.**\n- `preg: true` — pregnancy confirmed (test, reveal, missed period, showing). Set `cycle_stage_id: 5`, `cervix_state_id: 1`, advance `days_preg` daily, preserve `conception_date`.\n- Neither: `preg: false`, `conceived: false`, `days_preg: 0`, `conception_date: ""`.\n\n**Female / futanari — breast & lactation** (leave at `0` / `false` unless pregnant, postpartum, or lactating):\n- `cup_size` — uppercase letter, `AA` or `A`–`K` (UK `FF`/`GG`/`HH`/`II`/`JJ` alias to the next US size up). Set on first appearance from narrative cues; preserve unless biology changes (puberty, magic, surgery). Does NOT change with arousal or engorgement.\n  Cues: flat/tiny → `AA`; petite/perky → `A`; B-cup → `B`; average/handful → `C`; full/ample → `D`; busty/double-D → `DD`; heavy/very full → `F`–`G`; huge/massive → `H`+.\n- `breast_fullness_pct` — 0-100 engorgement relative to the cup. Rises with pregnancy, arousal, and milk buildup; drops after nursing/pumping.\n- `milk_ml` / `milk_capacity_ml` — stored vs. max (combined breasts ~100-600 ml). `0` when not lactating.\n- `nipple_sensitivity_pct` — 0-100; rises with arousal/hormones/stimulation, falls fast when it stops.\n- `lactating` — `true` once milk production begins (mid-to-late pregnancy onward).\n\n**Male / futanari — refractory & semen** (`0` for others):\n- `refractory_minutes` — minutes until ready (`0` = ready); decrement as time passes.\n- `refractory_total` — length of the current refractory period (`0` if none).\n- `semen_ml` / `semen_capacity_ml` — current vs. max; drops after ejaculation, recovers with rest/arousal.\n- `male_fertility_pct` — 0-100; adjust for rut, recovery, fatigue, magic.\n\n**Anal — all characters** (`0` if no anal content has occurred):\n- `anal_fullness_pct` — 0-100 volume inside the canal; rises with insertion/ejaculation, falls with withdrawal/cleanup.\n- `anal_tightness_pct` — 0-100 sphincter resistance; `100` = virgin-tight, drops with use/lube/arousal, recovers with rest.\n- `prostate_stimulation_pct` — 0-100 active stimulation; rises with prostate-angled pressure, falls fast when it stops. Leave `0` for characters without a prostate.\n\n### OTHER FIELDS\n\n- `internal_thought` — one short first-person sentence of current inner monologue; refresh every turn.\n- `days_since_first_meeting` — in-world days since the character first met `{{user}}`; advance with dates.\n- `inactive` / `inactiveReason` — set when asleep, comatose, dead, refusing engagement, or off-scene.\n- `bg` — hex color matching the character\'s vibe (e.g. `#2d1b4e`); preserve once chosen.\n',
+  sysPrompt: '## NARRATIVE CHARACTER TRACKER (Pulse Thread)\n\nEmit one tracker per turn: a `worldData` object (`current_date` YYYY-MM-DD, `current_time` 24h HH:MM) and a `characters` array.\n\n### RULES\n\n1. **Full schema, every turn.** Emit every field below, always wrapped as `{ "characters": [ {...} ] }` (array even for one character). No renames, omissions, or shortened forms. Migrate values from any older tracker shapes in history into this schema — never reproduce an old layout.\n2. **Deduce, don\'t blank.** Infer missing values from narrative cues (dialogue, actions, time, lore). Use `0` / `""` / `false` only when there is truly no signal. Preserve biology, anatomy, and `bg` across turns unless the narrative explicitly changes them.\n3. **Never track `{{user}}`.** Drop any `{{user}}` entry silently, even from history. Tracker is NPCs only.\n4. **Up to 4 active characters** (excluding `{{user}}`); mark the rest `"inactive": true`.\n5. **Enums are integers**, never strings (`cycle_stage_id`, `cervix_state_id`, `last_react`, `inactiveReason`).\n6. **Don\'t emit derived fields.** The renderer computes stat deltas (`ap`/`dp`/`tp`/`cp` change), bracket labels, and descriptors.\n\n### CANONICAL SCHEMA\n\n```json\n{\n  "worldData": { "current_date": "YYYY-MM-DD", "current_time": "HH:MM" },\n  "characters": [\n    {\n      "name": "Character Name",\n      "ap": 0, "dp": 0, "tp": 0, "cp": 0,\n      "sex": "female",\n      "cycle_stage_id": 0, "cycle_day": 0,\n      "womb_fullness_pct": 0, "womb_receptivity_pct": 0, "cervix_state_id": 0,\n      "cup_size": "", "breast_fullness_pct": 0,\n      "milk_ml": 0, "milk_capacity_ml": 0, "nipple_sensitivity_pct": 0, "lactating": false,\n      "breeding_count": 0,\n      "preg": false, "conceived": false, "days_preg": 0, "conception_date": "",\n      "refractory_minutes": 0, "refractory_total": 0,\n      "semen_ml": 0, "semen_capacity_ml": 0, "male_fertility_pct": 0,\n      "anal_fullness_pct": 0, "anal_tightness_pct": 0, "prostate_stimulation_pct": 0,\n      "last_react": 0, "internal_thought": "",\n      "days_since_first_meeting": 0, "inactive": false, "inactiveReason": 0,\n      "bg": "#808080"\n    }\n  ]\n}\n```\n\n### STAT METERS (hard caps)\n\n| Field | Range | Brackets |\n|---|---|---|\n| **ap** Affection | 0-200 | 0-30 Strangers / 31-60 Acquaintances / 61-90 Friends / 91-120 Romantic / 121-150 Steady / 151-180 Committed / 181-200 Devoted |\n| **dp** Desire | 0-150 | 0-25 Cold / 26-50 Warm / 51-75 Interested / 76-100 Aroused / 101-125 Needy / 126-150 Desperate |\n| **tp** Trust | 0-150 | Falls with lies / broken promises; rises with reliability. |\n| **cp** Contempt | 0-150 | Rises when harmed; high cp drags ap/dp/tp down. |\n\nMove +/- per turn, scaled to the moment.\n\n### ENUMS\n\n- `last_react`: `0` Neutral, `1` Like/Approve, `2` Dislike/Disapprove.\n- `inactiveReason`: `0` active, `1` Asleep, `2` Comatose, `3` Contempt/refusing, `4` Incapacitated, `5` Death.\n- `cycle_stage_id`: `0` unknown, `1` menstruation (d1-5), `2` follicular (d6-13), `3` ovulation (d14-16, peak), `4` luteal (d17-28), `5` pregnancy, `6` rut/heat.\n- `cervix_state_id` (closed→open): `0` unknown, `1` sealed, `2` firm, `3` soft, `4` open, `5` dilated, `6` kissed.\n\n### BIOLOGY\n\n`sex` is lowercase `female` | `male` | `futanari` | `other`; preserve unless biology explicitly changes. **Futanari emit both female and male field groups.** Advance `cycle_day`/`days_preg`/`refractory_minutes` as narrative time passes.\n\n**Female / futanari — cycle & womb**\n- `womb_fullness_pct` / `womb_receptivity_pct` — 0-100. Receptivity is high at ovulation/rut and high arousal, low at menstruation or low arousal.\n- `breeding_count` — internal finishes this cycle; increment per internal ejaculation, reset at a new cycle.\n\n**Conception & pregnancy** (two stages):\n- `conceived: true` — fertilized but not showing. The engine auto-sets this when `womb_fullness_pct > 85%` in a fertile window (ovulation/rut/luteal d≤19), automatic at 100%. **Once true, preserve every turn until pregnancy is confirmed — never revert.**\n- `preg: true` — pregnancy confirmed (test, reveal, missed period, showing). Also set `cycle_stage_id: 5`, `cervix_state_id: 1`, advance `days_preg` daily, preserve `conception_date`.\n- Neither: all conception/pregnancy fields at defaults.\n\n**Female / futanari — breast & lactation** (defaults unless pregnant/postpartum/lactating):\n- `cup_size` — `AA`/`A`–`K`. Cues: flat/tiny→`AA`, petite→`A`, B→`B`, handful→`C`, full→`D`, DD→`DD`, heavy→`F`–`G`, huge→`H`+. UK doubled letters (`FF`/`GG`/…) alias up. Set on first appearance; preserve unless biology changes (puberty, magic, surgery) — **not** with arousal or engorgement.\n- `breast_fullness_pct` — 0-100 engorgement vs. cup. Rises with pregnancy/arousal/milk buildup; drops after nursing/pumping.\n- `milk_ml` / `milk_capacity_ml` — stored vs. max (combined ~100-600 ml). `0` when not lactating.\n- `nipple_sensitivity_pct` — 0-100; rises with arousal/hormones/stimulation, falls fast when it stops.\n- `lactating` — `true` once production begins (mid-to-late pregnancy onward).\n\n**Male / futanari — refractory & semen** (`0` for others):\n- `refractory_minutes` — minutes until ready (`0` = ready); decrement with time. `refractory_total` — length of the current period (`0` if none).\n- `semen_ml` / `semen_capacity_ml` — current vs. max; drops after ejaculation, recovers with rest/arousal.\n- `male_fertility_pct` — 0-100; adjust for rut, recovery, fatigue, magic.\n\n**Anal — all characters** (defaults if no anal content):\n- `anal_fullness_pct` — 0-100 volume inside; rises with insertion/ejaculation, falls with withdrawal/cleanup.\n- `anal_tightness_pct` — 0-100 sphincter resistance; `100` = virgin-tight, drops with use/lube/arousal, recovers with rest.\n- `prostate_stimulation_pct` — 0-100 active stimulation; rises with prostate-angled pressure, falls fast when it stops. Leave `0` without a prostate.\n\n### OTHER FIELDS\n\n- `internal_thought` — one short first-person sentence of current inner monologue; refresh every turn.\n- `days_since_first_meeting` — in-world days since first meeting `{{user}}`.\n- `inactive` / `inactiveReason` — set when asleep, comatose, dead, refusing engagement, or off-scene.\n- `bg` — hex color matching the character\'s vibe; preserve once chosen.\n',
   customFields: [
     {
       key: "ap",
@@ -18261,6 +18261,65 @@ var runtimeSeededPresets = [];
 var TEMPLATE_CACHE = new Map;
 var helpersRegistered = false;
 var panelRoot = null;
+var READY_MIN_VERSION = [1, 0, 6];
+function parseVersionSegment(segment) {
+  if (!segment)
+    return 0;
+  const match = segment.match(/\d+/);
+  return match ? Number(match[0]) : 0;
+}
+function isVersionAtLeast(version, minimum) {
+  const parts = version.split(".");
+  for (let index = 0;index < minimum.length; index += 1) {
+    const current = parseVersionSegment(parts[index]);
+    const required = minimum[index];
+    if (current > required)
+      return true;
+    if (current < required)
+      return false;
+  }
+  return true;
+}
+async function shouldBroadcastReadyForHost() {
+  try {
+    const response = await fetch("/api/v1/system/info", { credentials: "same-origin" });
+    if (!response.ok)
+      return true;
+    const payload = await response.json();
+    const version = typeof payload?.backend?.version === "string" ? payload.backend.version : null;
+    return version ? isVersionAtLeast(version, READY_MIN_VERSION) : true;
+  } catch {
+    return true;
+  }
+}
+function createReadyGate(ctx) {
+  const readyContext = ctx;
+  if (typeof readyContext.deferReady !== "function" || typeof readyContext.ready !== "function") {
+    return {
+      dispose() {},
+      release() {}
+    };
+  }
+  readyContext.deferReady();
+  const shouldBroadcastReady = shouldBroadcastReadyForHost();
+  let disposed = false;
+  let released = false;
+  return {
+    dispose() {
+      disposed = true;
+    },
+    release() {
+      if (disposed || released)
+        return;
+      released = true;
+      shouldBroadcastReady.then((allowed) => {
+        if (!disposed && allowed) {
+          readyContext.ready?.();
+        }
+      });
+    }
+  };
+}
 var FERTILITY_STAGE_BY_ID = {
   1: "menstruation",
   2: "follicular",
@@ -18626,11 +18685,14 @@ function byId(id) {
     return scoped;
   return document.getElementById(id);
 }
+var DEFAULT_PANEL_STATUS = "Waiting for tracker tag...";
+var LOADING_CONFIG_STATUS = "Loading config...";
+var CONFIG_ERROR_STATUS_PREFIX = "Config load failed:";
 var PANEL_HTML = `
   <section id="sst-lumi-panel" class="sst-lumi-panel">
     <header class="sst-lumi-header">
       <h3>Silly Sim Tracker</h3>
-      <span class="sst-lumi-status" id="sst-lumi-status">Waiting for tracker tag...</span>
+      <span class="sst-lumi-status" id="sst-lumi-status">${DEFAULT_PANEL_STATUS}</span>
     </header>
     <div class="sst-lumi-controls">
       <label>Template<select id="sst-lumi-template"></select></label>
@@ -18836,6 +18898,10 @@ function setStatus(text) {
   const el = byId("sst-lumi-status");
   if (el)
     el.textContent = text;
+}
+function shouldResetStatusAfterConfigLoad() {
+  const text = byId("sst-lumi-status")?.textContent?.trim() || "";
+  return !text || text === LOADING_CONFIG_STATUS || text.startsWith(CONFIG_ERROR_STATUS_PREFIX);
 }
 function renderCapabilities(grantedPermissions, requestedPermissions, ephemeralPoolStatus) {
   const perms = grantedPermissions.length ? grantedPermissions.join(", ") : "none";
@@ -19335,6 +19401,7 @@ function downloadJson(filename, content) {
   URL.revokeObjectURL(url);
 }
 function setup(ctx) {
+  const readyGate = createReadyGate(ctx);
   registerTemplateHelpers();
   ctx.dom.cleanup();
   let config = { ...DEFAULT_CONFIG };
@@ -19353,6 +19420,8 @@ function setup(ctx) {
   const trackerMessageRenders = new Map;
   const trackerComparisonBaselines = new Map;
   const trackerGeneratingIndicators = new Map;
+  let latestMessageRenderIntent = null;
+  let pendingGeneratingIndicatorMessageId = null;
   const inlineProcessor = createInlineTemplateProcessor({
     getConfig: () => ({
       enableInlineTemplates: config.enableInlineTemplates,
@@ -19604,6 +19673,21 @@ function setup(ctx) {
     latestTrackerMessageId = latestId;
     updateRegenerateButton();
   };
+  const clearLatestMessageRenderIntent = (messageId) => {
+    if (!latestMessageRenderIntent)
+      return;
+    if (messageId && latestMessageRenderIntent.messageId !== messageId)
+      return;
+    latestMessageRenderIntent = null;
+  };
+  const retryLatestMessageRenderIntent = (messageId) => {
+    if (!messageId || !latestMessageRenderIntent || latestMessageRenderIntent.messageId !== messageId)
+      return;
+    if (latestMessageRenderIntent.mode === "side_left" || latestMessageRenderIntent.mode === "side_right")
+      return;
+    renderTrackerIntoMessage(latestMessageRenderIntent.messageId, latestMessageRenderIntent.data, latestMessageRenderIntent.preset, latestMessageRenderIntent.previousData, latestMessageRenderIntent.mode);
+    pruneNonLatestMessageTrackers();
+  };
   const clearSideTrackerRender = () => {
     if (sideTrackerMount) {
       sideTrackerMount.remove();
@@ -19709,6 +19793,7 @@ function setup(ctx) {
     }
   };
   const showGeneratingIndicator = (messageId) => {
+    pendingGeneratingIndicatorMessageId = messageId;
     const existing = trackerGeneratingIndicators.get(messageId);
     if (existing && existing.isConnected)
       return;
@@ -19721,6 +19806,9 @@ function setup(ctx) {
     trackerGeneratingIndicators.set(messageId, mount);
   };
   const hideGeneratingIndicator = (messageId) => {
+    if (pendingGeneratingIndicatorMessageId === messageId) {
+      pendingGeneratingIndicatorMessageId = null;
+    }
     const mount = trackerGeneratingIndicators.get(messageId);
     if (mount)
       ctx.dom.uninject(mount);
@@ -19730,6 +19818,12 @@ function setup(ctx) {
     for (const [, mount] of trackerGeneratingIndicators)
       ctx.dom.uninject(mount);
     trackerGeneratingIndicators.clear();
+    pendingGeneratingIndicatorMessageId = null;
+  };
+  const retryGeneratingIndicator = (messageId) => {
+    if (!messageId || pendingGeneratingIndicatorMessageId !== messageId)
+      return;
+    showGeneratingIndicator(messageId);
   };
   const sameRenderInputs = (a, data, preset, previousData, mode) => {
     if (!a)
@@ -19801,8 +19895,10 @@ function setup(ctx) {
     if (!parsed) {
       setStatus("Tracker found (invalid JSON/YAML)");
       renderEmpty(raw);
-      if (messageId)
+      if (messageId) {
+        clearLatestMessageRenderIntent(messageId);
         clearMessageTrackerRender(messageId);
+      }
       return;
     }
     latestTrackerRaw = raw;
@@ -19812,10 +19908,18 @@ function setup(ctx) {
       injectIntoPanelBody(html);
     });
     if (mountMode === "side_left" || mountMode === "side_right") {
+      clearLatestMessageRenderIntent();
       renderTrackerInSidebar(parsed, preset, comparisonData, mountMode);
       if (messageId)
         clearMessageTrackerRender(messageId);
     } else if (messageId) {
+      latestMessageRenderIntent = {
+        messageId,
+        data: parsed,
+        preset,
+        previousData: comparisonData,
+        mode: mountMode
+      };
       clearSideTrackerRender();
       renderTrackerIntoMessage(messageId, parsed, preset, comparisonData, mountMode);
       pruneNonLatestMessageTrackers();
@@ -19829,6 +19933,7 @@ function setup(ctx) {
       let wasLatest = false;
       if (messageId && trackerMessageIds.has(messageId)) {
         trackerMessageIds.delete(messageId);
+        clearLatestMessageRenderIntent(messageId);
         clearMessageTrackerRender(messageId);
         if (latestTrackerMessageId === messageId) {
           latestTrackerMessageId = null;
@@ -19875,6 +19980,11 @@ function setup(ctx) {
       const ok = Boolean(obj.ok);
       const message = typeof obj.message === "string" ? obj.message : ok ? "Import complete" : "Import failed";
       setStatus(message);
+      return;
+    }
+    if (obj?.type === "config_error") {
+      const message = typeof obj.message === "string" && obj.message.trim() ? obj.message.trim() : "Unknown error";
+      setStatus(`${CONFIG_ERROR_STATUS_PREFIX} ${message}`);
       return;
     }
     if (obj?.type === "connections_list" && Array.isArray(obj.connections)) {
@@ -19981,6 +20091,9 @@ function setup(ctx) {
       pendingTrackerPayload = null;
       handleTrackerPayload(pending.raw, pending.sourceContent, pending.messageId);
     }
+    if (shouldResetStatusAfterConfigLoad()) {
+      setStatus(DEFAULT_PANEL_STATUS);
+    }
     requestInitialTrackerRehydrate();
     inlineProcessor.processAll();
   });
@@ -20013,7 +20126,6 @@ function setup(ctx) {
       ctx.sendToBackend({ type: "get_latest_tracker", chatId });
     }
     requestAnimationFrame(() => requestAnimationFrame(() => {
-      renderTrackersFromDOM();
       inlineProcessor.processAll();
     }));
   };
@@ -20047,6 +20159,7 @@ function setup(ctx) {
     latestTrackerRaw = null;
     latestTrackerSourceContent = null;
     latestContent = null;
+    latestMessageRenderIntent = null;
     if (context.content) {
       handleContent(context.content, context.messageId);
     }
@@ -20057,6 +20170,13 @@ function setup(ctx) {
     const context = readMessageContext(payload);
     if (!context || context.isUser === true)
       return;
+    retryLatestMessageRenderIntent(context.messageId);
+    retryGeneratingIndicator(context.messageId);
+    const latestMountedId = ctx.messages.getLatestMessageId();
+    const needsLatestAttach = !!context.messageId && context.messageId === latestMountedId && latestMessageRenderIntent?.messageId !== context.messageId && !trackerMessageRenders.has(context.messageId);
+    if (needsLatestAttach && context.content) {
+      handleContent(context.content, context.messageId);
+    }
     runInlinePass(context.messageId);
   };
   const onMessageDeleted = (payload) => {
@@ -20066,6 +20186,7 @@ function setup(ctx) {
       return;
     if (trackerMessageIds.has(context.messageId)) {
       trackerMessageIds.delete(context.messageId);
+      clearLatestMessageRenderIntent(context.messageId);
       clearMessageTrackerRender(context.messageId);
     }
     trackerComparisonBaselines.delete(context.messageId);
@@ -20082,19 +20203,6 @@ function setup(ctx) {
       updateRegenerateButton();
     }
   };
-  const renderTrackersFromDOM = () => {
-    const messageNodes = Array.from(document.querySelectorAll("[data-message-id]"));
-    for (const msgNode of messageNodes) {
-      const msgId = msgNode.getAttribute("data-message-id");
-      if (!msgId)
-        continue;
-      const preSel = `pre[data-code-lang="${config.codeBlockIdentifier}"]`;
-      const preBlock = msgNode.querySelector(preSel);
-      const raw = preBlock?.textContent?.trim() || "";
-      if (raw)
-        handleTrackerPayload(raw, raw, msgId);
-    }
-  };
   const resetChatState = () => {
     previousTrackerData = null;
     trackerComparisonBaselines.clear();
@@ -20102,6 +20210,7 @@ function setup(ctx) {
     latestTrackerRaw = null;
     latestTrackerSourceContent = null;
     latestContent = null;
+    latestMessageRenderIntent = null;
     trackerMessageIds.clear();
     updateRegenerateButton();
     for (const mount of trackerMessageMounts.values())
@@ -20258,7 +20367,7 @@ function setup(ctx) {
   ctx.sendToBackend({ type: "get_config" });
   ctx.sendToBackend({ type: "get_connections" });
   updatePermissionGatedControls();
-  setStatus("Loading config...");
+  setStatus(LOADING_CONFIG_STATUS);
   renderEmpty("When a message includes a tracker tag, cards will appear here.");
   let configRetryTimer = null;
   const scheduleConfigRetry = () => {
@@ -20272,7 +20381,9 @@ function setup(ctx) {
     }, 2000);
   };
   scheduleConfigRetry();
+  readyGate.release();
   return () => {
+    readyGate.dispose();
     panelRoot = null;
     if (modelCombobox) {
       modelCombobox.destroy();
