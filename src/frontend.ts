@@ -854,6 +854,15 @@ function darkenColor(hex: string, amount = 20): string {
   return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
 }
 
+function normalizeHexColor(value: unknown, fallback = "#6a5acd"): string {
+  const clean = typeof value === "string" ? value.trim().replace(/^#/, "") : "";
+  if (/^[0-9a-f]{6}$/i.test(clean)) return `#${clean}`;
+  if (/^[0-9a-f]{3}$/i.test(clean)) {
+    return `#${clean.split("").map((digit) => `${digit}${digit}`).join("")}`;
+  }
+  return fallback;
+}
+
 function adjustColorBrightness(hex: string, brightnessPercent: number): string {
   const clean = (hex || "#000000").replace("#", "");
   const factor = Math.max(0, Math.min(100, brightnessPercent)) / 100;
@@ -1190,7 +1199,7 @@ function buildTemplateData(
   const characterPayload = characters.map((character) => {
     const stats = character as CharacterStats;
     const name = typeof stats.name === "string" ? stats.name : "Character";
-    const bgColor = typeof stats.bg === "string" ? stats.bg : "#6a5acd";
+    const bgColor = normalizeHexColor(stats.bg);
 
     const isNestedStats =
       stats && typeof stats === "object" && typeof stats.stats === "object" && stats.stats !== null;

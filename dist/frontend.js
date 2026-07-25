@@ -18951,6 +18951,15 @@ function darkenColor(hex, amount = 20) {
   const b = Math.max(0, parseInt(clean.slice(4, 6), 16) - amount);
   return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
 }
+function normalizeHexColor(value, fallback = "#6a5acd") {
+  const clean = typeof value === "string" ? value.trim().replace(/^#/, "") : "";
+  if (/^[0-9a-f]{6}$/i.test(clean))
+    return `#${clean}`;
+  if (/^[0-9a-f]{3}$/i.test(clean)) {
+    return `#${clean.split("").map((digit) => `${digit}${digit}`).join("")}`;
+  }
+  return fallback;
+}
 function adjustColorBrightness(hex, brightnessPercent) {
   const clean = (hex || "#000000").replace("#", "");
   const factor = Math.max(0, Math.min(100, brightnessPercent)) / 100;
@@ -19242,7 +19251,7 @@ function buildTemplateData(data, preset, previousData) {
   const characterPayload = characters.map((character) => {
     const stats = character;
     const name = typeof stats.name === "string" ? stats.name : "Character";
-    const bgColor = typeof stats.bg === "string" ? stats.bg : "#6a5acd";
+    const bgColor = normalizeHexColor(stats.bg);
     const isNestedStats = stats && typeof stats === "object" && typeof stats.stats === "object" && stats.stats !== null;
     const templateStats = isNestedStats ? { ...stats, ...stats.stats } : { ...stats };
     if (isNestedStats) {
