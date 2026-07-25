@@ -54,7 +54,12 @@ const DEFAULT_CONFIG: TrackerConfig = {
 
 const BUILTIN_PRESETS = getTemplatePresets();
 let runtimeSeededPresets: TemplatePreset[] = [];
-const TEMPLATE_CACHE = new Map<string, Handlebars.TemplateDelegate>();
+type CompiledTemplateCacheEntry = {
+  source: string;
+  compiled: Handlebars.TemplateDelegate;
+};
+
+const TEMPLATE_CACHE = new Map<string, CompiledTemplateCacheEntry>();
 let helpersRegistered = false;
 let panelRoot: Element | null = null;
 const READY_MIN_VERSION = [1, 0, 6] as const;
@@ -89,14 +94,18 @@ async function shouldBroadcastReadyForHost(): Promise<boolean> {
 }
 
 function createReadyGate(ctx: SpindleFrontendContext) {
-  if (typeof ctx.deferReady !== "function" || typeof ctx.ready !== "function") {
+  const readyContext = ctx as SpindleFrontendContext & {
+    deferReady?: () => void;
+    ready?: () => void;
+  };
+  if (typeof readyContext.deferReady !== "function" || typeof readyContext.ready !== "function") {
     return {
       dispose() {},
       release() {},
     };
   }
 
-  ctx.deferReady();
+  readyContext.deferReady();
   const shouldBroadcastReady = shouldBroadcastReadyForHost();
   let disposed = false;
   let released = false;
@@ -110,7 +119,7 @@ function createReadyGate(ctx: SpindleFrontendContext) {
       released = true;
       void shouldBroadcastReady.then((allowed) => {
         if (!disposed && allowed) {
-          ctx.ready();
+          readyContext.ready?.();
         }
       });
     },
@@ -845,6 +854,15 @@ function darkenColor(hex: string, amount = 20): string {
   return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
 }
 
+function normalizeHexColor(value: unknown, fallback = "#6a5acd"): string {
+  const clean = typeof value === "string" ? value.trim().replace(/^#/, "") : "";
+  if (/^[0-9a-f]{6}$/i.test(clean)) return `#${clean}`;
+  if (/^[0-9a-f]{3}$/i.test(clean)) {
+    return `#${clean.split("").map((digit) => `${digit}${digit}`).join("")}`;
+  }
+  return fallback;
+}
+
 function adjustColorBrightness(hex: string, brightnessPercent: number): string {
   const clean = (hex || "#000000").replace("#", "");
   const factor = Math.max(0, Math.min(100, brightnessPercent)) / 100;
@@ -1142,13 +1160,13 @@ function extractCardTemplate(htmlTemplate?: string): string {
 }
 
 function compileTemplate(preset: TemplatePreset): Handlebars.TemplateDelegate | null {
-  const key = preset.id;
-  if (TEMPLATE_CACHE.has(key)) return TEMPLATE_CACHE.get(key) || null;
   const html = extractCardTemplate(preset.htmlTemplate);
   if (!html) return null;
+  const cached = TEMPLATE_CACHE.get(preset.id);
+  if (cached?.source === html) return cached.compiled;
   try {
     const compiled = Handlebars.compile(html);
-    TEMPLATE_CACHE.set(key, compiled);
+    TEMPLATE_CACHE.set(preset.id, { source: html, compiled });
     return compiled;
   } catch {
     return null;
@@ -1181,7 +1199,7 @@ function buildTemplateData(
   const characterPayload = characters.map((character) => {
     const stats = character as CharacterStats;
     const name = typeof stats.name === "string" ? stats.name : "Character";
-    const bgColor = typeof stats.bg === "string" ? stats.bg : "#6a5acd";
+    const bgColor = normalizeHexColor(stats.bg);
 
     const isNestedStats =
       stats && typeof stats === "object" && typeof stats.stats === "object" && stats.stats !== null;
@@ -1417,6 +1435,9 @@ export function setup(ctx: SpindleFrontendContext) {
   };
   type LatestMessageRenderIntent = TrackerRenderInputs & { messageId: string };
   const trackerMessageRenders = new Map<string, TrackerRenderInputs>();
+  // Streaming may deliver the same message's tracker several times. Freeze
+  // its baseline so final-chunk re-renders do not compare the payload to itself.
+  const trackerComparisonBaselines = new Map<string, TrackerData | null>();
   const trackerGeneratingIndicators = new Map<string, Element>();
   let latestMessageRenderIntent: LatestMessageRenderIntent | null = null;
   let pendingGeneratingIndicatorMessageId: string | null = null;
@@ -1878,6 +1899,8 @@ export function setup(ctx: SpindleFrontendContext) {
   ): boolean => {
     if (!a) return false;
     if (a.preset.id !== preset.id || a.mode !== mode) return false;
+    if (a.preset.htmlTemplate !== preset.htmlTemplate) return false;
+    if (JSON.stringify(a.preset.extSettings) !== JSON.stringify(preset.extSettings)) return false;
     if (JSON.stringify(a.data) !== JSON.stringify(data)) return false;
     if (JSON.stringify(a.previousData) !== JSON.stringify(previousData)) return false;
     return true;
@@ -1940,7 +1963,13 @@ export function setup(ctx: SpindleFrontendContext) {
       pendingTrackerPayload = { raw, sourceContent, messageId };
       return;
     }
+    let comparisonData = previousTrackerData;
     if (messageId) {
+      if (!trackerComparisonBaselines.has(messageId)) {
+        trackerComparisonBaselines.clear();
+        trackerComparisonBaselines.set(messageId, previousTrackerData);
+      }
+      comparisonData = trackerComparisonBaselines.get(messageId) || null;
       trackerMessageIds.add(messageId);
       latestTrackerMessageId = messageId;
       updateRegenerateButton();
@@ -1961,7 +1990,7 @@ export function setup(ctx: SpindleFrontendContext) {
     latestTrackerRaw = raw;
     latestTrackerSourceContent = sourceContent;
     setStatus(`Tracker updated (${preset.templateName})`);
-    renderTracker(parsed, raw, preset, previousTrackerData, (html) => {
+    renderTracker(parsed, raw, preset, comparisonData, (html) => {
       injectIntoPanelBody(html);
     });
     // In-message rendering MUST use the messageId for *this* payload. The
@@ -1976,18 +2005,18 @@ export function setup(ctx: SpindleFrontendContext) {
     // template switch) must now pass the messageId explicitly.
     if (mountMode === "side_left" || mountMode === "side_right") {
       clearLatestMessageRenderIntent();
-      renderTrackerInSidebar(parsed, preset, previousTrackerData, mountMode);
+      renderTrackerInSidebar(parsed, preset, comparisonData, mountMode);
       if (messageId) clearMessageTrackerRender(messageId);
     } else if (messageId) {
       latestMessageRenderIntent = {
         messageId,
         data: parsed,
         preset,
-        previousData: previousTrackerData,
+        previousData: comparisonData,
         mode: mountMode,
       };
       clearSideTrackerRender();
-      renderTrackerIntoMessage(messageId, parsed, preset, previousTrackerData, mountMode);
+      renderTrackerIntoMessage(messageId, parsed, preset, comparisonData, mountMode);
       pruneNonLatestMessageTrackers();
     }
 
@@ -2011,6 +2040,7 @@ export function setup(ctx: SpindleFrontendContext) {
       }
       if (wasLatest) {
         previousTrackerData = null;
+        trackerComparisonBaselines.clear();
         setStatus("No tracker tag in active swipe/edit");
         renderEmpty("No tracker tag found in this message version.");
       }
@@ -2097,7 +2127,7 @@ export function setup(ctx: SpindleFrontendContext) {
       return;
     }
     if (obj?.type === "tracker_history_latest") {
-      const entry = obj.entry as { messageId?: unknown; payload?: unknown } | null;
+      const entry = obj.entry as { messageId?: unknown; payload?: unknown; previousPayload?: unknown } | null;
       if (entry && typeof entry.payload === "string" && entry.payload.trim()) {
         const msgId = typeof entry.messageId === "string" ? entry.messageId : null;
         // Hydration safety net: only useful when the latest tracker-bearing
@@ -2106,6 +2136,13 @@ export function setup(ctx: SpindleFrontendContext) {
         // message-level render with `previousData` now equal to the latest
         // data (no diffs).
         if (msgId && trackerMessageIds.has(msgId)) return;
+        if (msgId) {
+          const previous = typeof entry.previousPayload === "string"
+            ? parseTrackerBlock(entry.previousPayload)
+            : null;
+          trackerComparisonBaselines.clear();
+          trackerComparisonBaselines.set(msgId, previous);
+        }
         handleTrackerPayload(entry.payload, entry.payload, msgId);
       }
       return;
@@ -2238,6 +2275,7 @@ export function setup(ctx: SpindleFrontendContext) {
     }
     if (context.messageId) inlineProcessor.clearMessage(context.messageId);
     previousTrackerData = null;
+    trackerComparisonBaselines.clear();
     latestTrackerRaw = null;
     latestTrackerSourceContent = null;
     latestContent = null;
@@ -2279,11 +2317,13 @@ export function setup(ctx: SpindleFrontendContext) {
       clearLatestMessageRenderIntent(context.messageId);
       clearMessageTrackerRender(context.messageId);
     }
+    trackerComparisonBaselines.delete(context.messageId);
     hideGeneratingIndicator(context.messageId);
     inlineProcessor.clearMessage(context.messageId);
     if (latestTrackerMessageId === context.messageId) {
       latestTrackerMessageId = null;
       previousTrackerData = null;
+      trackerComparisonBaselines.clear();
       latestTrackerRaw = null;
       latestTrackerSourceContent = null;
       latestContent = null;
@@ -2303,6 +2343,7 @@ export function setup(ctx: SpindleFrontendContext) {
 
   const resetChatState = () => {
     previousTrackerData = null;
+    trackerComparisonBaselines.clear();
     latestTrackerMessageId = null;
     latestTrackerRaw = null;
     latestTrackerSourceContent = null;

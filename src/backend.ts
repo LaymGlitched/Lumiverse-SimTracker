@@ -304,22 +304,57 @@ function sanitizeRetainCount(value: unknown): number {
   return Math.max(0, Math.min(20, Math.floor(value)));
 }
 
+function upgradeLegacyImportedPreset(preset: TemplatePreset): TemplatePreset {
+  const html = preset.htmlTemplate || "";
+  const isMissingAttire = !html.includes("nw-attire");
+  const bundled = getTemplatePresetById("narrative-weave-simtracker");
+  const bundledRevision = Number(bundled.extSettings?.presetRevision) || 0;
+  const importedRevision = Number(preset.extSettings?.presetRevision) || 0;
+  const isOutdatedRevision = importedRevision < bundledRevision;
+  const isLegacyNarrativeWeave =
+    preset.templateName === "Narrative Weave SimTracker"
+    && html.includes("nw-turn-updates")
+    && html.includes("nw-delta-segment")
+    && (!html.includes("nw-stat-numbers") || isMissingAttire || isOutdatedRevision);
+
+  if (!isLegacyNarrativeWeave) return preset;
+
+  // Imported Narrative Weave copies receive timestamp IDs, so selecting one
+  // bypasses bundled updates. Upgrade only copies with known template markers.
+  return {
+    ...preset,
+    htmlTemplate: bundled.htmlTemplate || preset.htmlTemplate,
+    ...(isMissingAttire || isOutdatedRevision
+      ? {
+          sysPrompt: bundled.sysPrompt || preset.sysPrompt,
+          displayInstructions: bundled.displayInstructions || preset.displayInstructions,
+          inlineTemplatesEnabled: bundled.inlineTemplatesEnabled ?? preset.inlineTemplatesEnabled,
+          inlineTemplates: bundled.inlineTemplates || preset.inlineTemplates,
+          customFields: bundled.customFields || preset.customFields,
+          extSettings: bundled.extSettings || preset.extSettings,
+        }
+      : {}),
+  };
+}
+
 function sanitizePresetArray(value: unknown): TemplatePreset[] {
   if (!Array.isArray(value)) return [];
   return value
     .filter((item) => item && typeof item === "object")
     .map((item, idx) => {
       const p = item as Record<string, unknown>;
-      return {
+      return upgradeLegacyImportedPreset({
         id: typeof p.id === "string" && p.id ? p.id : `user-preset-${idx}`,
         templateName: typeof p.templateName === "string" ? p.templateName : `User Preset ${idx + 1}`,
         templateAuthor: typeof p.templateAuthor === "string" ? p.templateAuthor : "User",
         htmlTemplate: typeof p.htmlTemplate === "string" ? p.htmlTemplate : "",
         sysPrompt: typeof p.sysPrompt === "string" ? p.sysPrompt : "",
         displayInstructions: typeof p.displayInstructions === "string" ? p.displayInstructions : "",
+        inlineTemplatesEnabled: typeof p.inlineTemplatesEnabled === "boolean" ? p.inlineTemplatesEnabled : false,
+        inlineTemplates: Array.isArray(p.inlineTemplates) ? p.inlineTemplates : [],
         customFields: Array.isArray(p.customFields) ? (p.customFields as any) : [],
         extSettings: (p.extSettings && typeof p.extSettings === "object" ? p.extSettings : {}) as Record<string, unknown>,
-      };
+      });
     });
 }
 
@@ -2106,12 +2141,13 @@ function stripAllTrackerBlocks(content: string, identifier: string): string {
     if (foundType && foundType !== desiredType) return full;
     return "";
   });
-  out = out.replace(/<div\b([^>]*)>[\s\S]*?<\/div>/gi, (full, rawAttrs) => {
+  out = out.replace(/<div\b([^>]*)>([\s\S]*?)<\/div>/gi, (full, rawAttrs, rawInner) => {
     const attrs = typeof rawAttrs === "string" ? rawAttrs : "";
+    const inner = typeof rawInner === "string" ? rawInner : "";
     if (!/style\s*=\s*(?:"[^"]*display\s*:\s*none\s*;?[^"]*"|'[^']*display\s*:\s*none\s*;?[^']*')/i.test(attrs)) {
       return full;
     }
-    return "";
+    return extractLegacyHiddenDivNormalizedPayload(inner, identifier) ? "" : full;
   });
   return out.replace(/\n\s*\n\s*\n/g, "\n\n").trim();
 }
@@ -2529,7 +2565,14 @@ async function handleImportPresetFile(payload: Record<string, unknown>, userId: 
     return;
   }
 
-  if (Array.isArray(parsed.inlineTemplates) && parsed.inlineTemplates.length > 0) {
+  const hasInlineTemplates = Array.isArray(parsed.inlineTemplates) && parsed.inlineTemplates.length > 0;
+  const hasTrackerTemplate =
+    typeof parsed.htmlTemplate === "string"
+    || typeof parsed.sysPrompt === "string"
+    || Array.isArray(parsed.customFields)
+    || (parsed.extSettings && typeof parsed.extSettings === "object");
+
+  if (hasInlineTemplates && !hasTrackerTemplate) {
     config = { ...config, inlinePacks: [...config.inlinePacks, parsed] };
     await saveConfig(userId);
     pushMacroValues();
@@ -2726,10 +2769,17 @@ spindle.onFrontendMessage(async (payload: unknown, userId: string) => {
     await rehydrateChatTrackerHistory(chatId);
     const history = getChatTrackerHistory(chatId);
     const entry = history.length > 0 ? history[history.length - 1] : null;
+    const previousEntry = history.length > 1 ? history[history.length - 2] : null;
     spindle.sendToFrontend({
       type: "tracker_history_latest",
       chatId,
-      entry: entry ? { messageId: entry.messageId, payload: entry.payload } : null,
+      entry: entry
+        ? {
+            messageId: entry.messageId,
+            payload: entry.payload,
+            previousPayload: previousEntry?.payload || null,
+          }
+        : null,
     }, userId);
     return;
   }
