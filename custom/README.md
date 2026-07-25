@@ -2,6 +2,14 @@
 
 Narrative Weave is a scene-aware Silly Sim Tracker preset for relationship-heavy roleplay. It renders one shared world and plot panel alongside up to four color-coded NPC cards, keeping the current scene, character state, relationship movement, and likely story directions visible without exposing the raw tracker data.
 
+- Rich world-state tracking for date, time, narrative arcs, completed events, parallel actions, and looming story beats.
+- Plot Momentum planning with NPC agendas, scene physics, pacing, branching paths, and strategy reasoning.
+- Expandable NPC cards showing mood, inner thoughts, attire, activity status, and turn sentiment.
+- Relationship meters for Affection, Desire, Trust, and Contempt, including per-message changes.
+- Custom character colors that integrate with your `<font color="#HEX">` prompt if present to visually distinguish each NPC throughout the tracker and narration.
+- Responsive inline rendering with collapsible details, helpful tooltips, and compact summaries.
+- Styled text-message conversations with received/sent bubbles, delivery status, reactions, timestamps, typing indicators, and Quick Reply support.
+
 ![Narrative Weave tracker rendered beneath a chat response](../screenshots/narrative-weave/narrative-weave-overview.png)
 
 ## Fork required for now
@@ -195,3 +203,19 @@ Narrative Weave consumes the canonical tracker tag used by Silly Sim Tracker:
 ```
 
 Both `E69F00` and `#E69F00` color forms are accepted. JSON and YAML payloads are supported by the extension, although the preset's generated format uses JSON.
+
+## Lumiverse Prompt
+
+To use the simtracker, this is the prompt and COT addition that has worked for me:
+
+```xml
+{{if {{sim_tracker}} }}{{trim}}
+<tracker_instructions>
+{{sim_tracker}}
+</tracker_instructions>
+
+{{.tracker_instructions = Tracker Usage: Plan how to use worldData elements to shape the scene. Plan using characterData to dictate character emotional state, choices, and dialogue. Review all listed attire, clothing, and accessories for canon accuracy and make note of any changes that must be updated. Note which 'worldData.plot_momentum' path was chosen, method of shaping the narrative and if path no longer valid, choose different path instead before deviating completely. Plan the updated sim tracker JSON object adhering to the schema provided in `<tracker_instructions>`. 
+Text Message Format: Plan if you need to render text messages using the Inline Text Message display format.}}
+{{/trim}}{{ /if }}
+```
+Then, simply add `{{.tracker_instructions}}` somewhere in your COT prompt and it will include the additional tracker hint if the tracker data is there and will do nothing when it is off, so it's safe to add to your prompt without having to worry about micromanaging it. If you have a `{{bullets}}` or `{{numbers}}` list already present in your COT, if you include the `{{.tracker_instructions}}` variable inside of it, the instructions are expanded and rendered on seperate lines automatically.
