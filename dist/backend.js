@@ -12589,6 +12589,7 @@ var lastSimStats = "{}";
 var activeUserId = null;
 var loadedConfigUserId = null;
 var activeSimTrackerMacroContent = "";
+var firstMessageFertilityHint = "";
 var activeChatId = null;
 var chatTrackerHistory = new Map;
 var rehydratedChats = new Set;
@@ -13780,11 +13781,16 @@ function pushMacroValues() {
     "Narrative text must remain outside the tracker tag."
   ].join(`
 `);
-  const simTracker = base ? directive + `
+  let simTracker = base ? directive + `
 
 ` + base.replace(/\{\{sim_format\}\}/g, fmt) : directive + `
 
 ` + fmt;
+  if (firstMessageFertilityHint) {
+    simTracker += `
+
+` + firstMessageFertilityHint;
+  }
   activeSimTrackerMacroContent = simTracker;
   spindle.updateMacroValue("sim_tracker", simTracker);
   spindle.updateMacroValue("last_sim_stats", lastSimStats || "{}");
@@ -14062,6 +14068,19 @@ spindle.on("GENERATION_STARTED", (payload, userId) => {
       return;
     activeChatId = chatId;
     await rehydrateChatTrackerHistory(chatId);
+    const previousHint = firstMessageFertilityHint;
+    firstMessageFertilityHint = "";
+    try {
+      const isNewChat = getChatTrackerHistory(chatId).length === 0 && await (async () => {
+        const msgs = await spindle.chat.getMessages(chatId);
+        return msgs.filter((m) => m.role === "user").length === 1;
+      })();
+      if (isNewChat) {
+        firstMessageFertilityHint = buildFirstMessageHint(config.fertilityCycleBias);
+      }
+    } catch {}
+    if (previousHint !== firstMessageFertilityHint)
+      pushMacroValues();
   })();
 });
 spindle.on("CHAT_SWITCHED", (payload, userId) => {
@@ -14334,24 +14353,6 @@ function tryRegisterInterceptor() {
       const conceptionDirective = buildConceptionDirective(conceptionNames);
       const history = getRecentChatTrackers(chatId, keepNewest);
       if (history.length === 0) {
-        const userMsgCount = retained.filter((m) => m && m.role === "user").length;
-        if (userMsgCount === 1) {
-          const hint = buildFirstMessageHint(config.fertilityCycleBias);
-          if (hint && activeSimTrackerMacroContent) {
-            for (let i = retained.length - 1;i >= 0; i--) {
-              const m = retained[i];
-              if (m && m.role === "system" && typeof m.content === "string" && m.content.includes(activeSimTrackerMacroContent)) {
-                retained[i] = {
-                  ...m,
-                  content: m.content.replace(activeSimTrackerMacroContent, activeSimTrackerMacroContent + `
-
-` + hint)
-                };
-                break;
-              }
-            }
-          }
-        }
         return retained;
       }
       const existingPayloads = new Set;

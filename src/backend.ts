@@ -67,6 +67,7 @@ let lastSimStats = "{}";
 let activeUserId: string | null = null;
 let loadedConfigUserId: string | null = null;
 let activeSimTrackerMacroContent = "";
+let firstMessageFertilityHint = "";
 
 /**
  * Last chat id the extension saw activity on. The interceptor signature
@@ -1727,9 +1728,12 @@ function pushMacroValues(): void {
     `</${tag}>`,
     "Narrative text must remain outside the tracker tag.",
   ].join("\n");
-  const simTracker = base
+  let simTracker = base
     ? directive + "\n\n" + base.replace(/\{\{sim_format\}\}/g, fmt)
     : directive + "\n\n" + fmt;
+  if (firstMessageFertilityHint) {
+    simTracker += "\n\n" + firstMessageFertilityHint;
+  }
   activeSimTrackerMacroContent = simTracker;
   spindle.updateMacroValue("sim_tracker", simTracker);
 
@@ -2093,6 +2097,25 @@ spindle.on("GENERATION_STARTED", (payload: unknown, userId?: string) => {
     if (!chatId) return;
     activeChatId = chatId;
     await rehydrateChatTrackerHistory(chatId);
+
+    // Brand-new chat: exactly one user message and no tracker history yet.
+    // Bake the fertility-cycle seed hint into the {{sim_tracker}} macro so it
+    // reaches the model alongside the tracker instructions.
+    const previousHint = firstMessageFertilityHint;
+    firstMessageFertilityHint = "";
+    try {
+      const isNewChat = getChatTrackerHistory(chatId).length === 0
+        && await (async () => {
+          const msgs = await spindle.chat.getMessages(chatId);
+          return msgs.filter((m) => m.role === "user").length === 1;
+        })();
+      if (isNewChat) {
+        firstMessageFertilityHint = buildFirstMessageHint(config.fertilityCycleBias);
+      }
+    } catch {
+      // If message introspection fails, leave the hint empty.
+    }
+    if (previousHint !== firstMessageFertilityHint) pushMacroValues();
   })();
 });
 
@@ -2460,25 +2483,8 @@ function tryRegisterInterceptor(): void {
       // duplicates already represented in the assembled prompt.
       const history = getRecentChatTrackers(chatId, keepNewest);
       if (history.length === 0) {
-        // If there is no tracker history yet, and this is the very first user
-        // message of the chat, inject a one-shot seed hint so models don't
-        // cluster on the same fertility position on every fresh chat.
-        const userMsgCount = retained.filter((m) => m && m.role === "user").length;
-        if (userMsgCount === 1) {
-          const hint = buildFirstMessageHint(config.fertilityCycleBias);
-          if (hint && activeSimTrackerMacroContent) {
-            for (let i = retained.length - 1; i >= 0; i--) {
-              const m = retained[i];
-              if (m && m.role === "system" && typeof m.content === "string" && m.content.includes(activeSimTrackerMacroContent)) {
-                retained[i] = {
-                  ...m,
-                  content: m.content.replace(activeSimTrackerMacroContent, activeSimTrackerMacroContent + "\n\n" + hint),
-                };
-                break;
-              }
-            }
-          }
-        }
+        // No tracker history to inject yet; the first-message fertility hint
+        // (if any) is already baked into the {{sim_tracker}} macro value.
         return retained;
       }
 
