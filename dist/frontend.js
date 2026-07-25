@@ -11841,6 +11841,19 @@ var PRESETS = [
 function getTemplatePresets() {
   return PRESETS;
 }
+function mergeTemplatePresets(...sources) {
+  const seenIds = new Set;
+  const presets = [];
+  for (const source of sources) {
+    for (const preset of source) {
+      if (seenIds.has(preset.id))
+        continue;
+      seenIds.add(preset.id);
+      presets.push(preset);
+    }
+  }
+  return presets;
+}
 
 // node_modules/yaml/browser/dist/nodes/identity.js
 var ALIAS = Symbol.for("yaml.alias");
@@ -18703,7 +18716,7 @@ var PANEL_HTML = `
       <label class="sst-lumi-checkbox"><input id="sst-lumi-inline" type="checkbox" />Enable inline displays</label>
       <label class="sst-lumi-checkbox"><input id="sst-lumi-hide" type="checkbox" checked />Hide tracker tags in chat</label>
       <div class="sst-lumi-actions">
-        <button id="sst-lumi-save" type="button">Save</button>
+        <button id="sst-lumi-save" type="button">Save Settings</button>
         <button id="sst-lumi-export" type="button">Export Preset</button>
         <button id="sst-lumi-import" type="button">Import Preset</button>
       </div>
@@ -18823,7 +18836,7 @@ function sanitizeSecondaryLLMModel(value) {
   return SECONDARY_LLM_MODEL_PLACEHOLDERS.has(trimmed.toLowerCase()) ? "" : trimmed;
 }
 function getAllPresets(config) {
-  return [...BUILTIN_PRESETS, ...runtimeSeededPresets, ...config.userPresets];
+  return mergeTemplatePresets(BUILTIN_PRESETS, runtimeSeededPresets, config.userPresets);
 }
 function getPresetById(config, id) {
   return getAllPresets(config).find((preset) => preset.id === id) || BUILTIN_PRESETS[0];
@@ -19984,7 +19997,12 @@ function setup(ctx) {
     }
     if (obj?.type === "config_error") {
       const message = typeof obj.message === "string" && obj.message.trim() ? obj.message.trim() : "Unknown error";
-      setStatus(`${CONFIG_ERROR_STATUS_PREFIX} ${message}`);
+      const operation = obj.operation === "save" ? "Config save failed:" : CONFIG_ERROR_STATUS_PREFIX;
+      setStatus(`${operation} ${message}`);
+      return;
+    }
+    if (obj?.type === "config_saved") {
+      setStatus("Settings saved");
       return;
     }
     if (obj?.type === "connections_list" && Array.isArray(obj.connections)) {
@@ -20263,7 +20281,7 @@ function setup(ctx) {
       handleTrackerPayload(latestTrackerRaw, latestTrackerSourceContent || latestTrackerRaw, latestTrackerMessageId);
     }
     inlineProcessor.processAll();
-    setStatus(`Previewing template: ${preset.templateName}`);
+    setStatus(`Previewing template: ${preset.templateName}. Click Save Settings to keep it.`);
   });
   saveButton?.addEventListener("click", () => {
     const templateSelectLocal = byId("sst-lumi-template");
@@ -20301,7 +20319,7 @@ function setup(ctx) {
     configTrackerTagNameHint = config.trackerTagName;
     applyTagInterceptor();
     inlineProcessor.processAll();
-    setStatus("Config saved");
+    setStatus("Saving settings...");
   });
   const exportButton = byId("sst-lumi-export");
   exportButton?.addEventListener("click", () => {

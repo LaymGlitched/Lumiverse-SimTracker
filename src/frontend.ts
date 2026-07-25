@@ -1,6 +1,6 @@
 import Handlebars from "handlebars";
 import type { SpindleFrontendContext, SpindleModelComboboxHandle } from "lumiverse-spindle-types";
-import { getTemplatePresets, type TemplatePreset } from "./templatePresets";
+import { getTemplatePresets, mergeTemplatePresets, type TemplatePreset } from "./templatePresets";
 import { parseTrackerBlock, type TrackerData } from "./trackerData";
 import { createInlineTemplateProcessor } from "./inlineTemplates";
 
@@ -594,7 +594,7 @@ const PANEL_HTML = `
       <label class="sst-lumi-checkbox"><input id="sst-lumi-inline" type="checkbox" />Enable inline displays</label>
       <label class="sst-lumi-checkbox"><input id="sst-lumi-hide" type="checkbox" checked />Hide tracker tags in chat</label>
       <div class="sst-lumi-actions">
-        <button id="sst-lumi-save" type="button">Save</button>
+        <button id="sst-lumi-save" type="button">Save Settings</button>
         <button id="sst-lumi-export" type="button">Export Preset</button>
         <button id="sst-lumi-import" type="button">Import Preset</button>
       </div>
@@ -722,7 +722,7 @@ function sanitizeSecondaryLLMModel(value: unknown): string {
 }
 
 function getAllPresets(config: TrackerConfig): TemplatePreset[] {
-  return [...BUILTIN_PRESETS, ...runtimeSeededPresets, ...config.userPresets];
+  return mergeTemplatePresets(BUILTIN_PRESETS, runtimeSeededPresets, config.userPresets);
 }
 
 function getPresetById(config: TrackerConfig, id: string): TemplatePreset {
@@ -2076,7 +2076,12 @@ export function setup(ctx: SpindleFrontendContext) {
     }
     if (obj?.type === "config_error") {
       const message = typeof obj.message === "string" && obj.message.trim() ? obj.message.trim() : "Unknown error";
-      setStatus(`${CONFIG_ERROR_STATUS_PREFIX} ${message}`);
+      const operation = obj.operation === "save" ? "Config save failed:" : CONFIG_ERROR_STATUS_PREFIX;
+      setStatus(`${operation} ${message}`);
+      return;
+    }
+    if (obj?.type === "config_saved") {
+      setStatus("Settings saved");
       return;
     }
     if (obj?.type === "connections_list" && Array.isArray(obj.connections)) {
@@ -2398,7 +2403,7 @@ export function setup(ctx: SpindleFrontendContext) {
       handleTrackerPayload(latestTrackerRaw, latestTrackerSourceContent || latestTrackerRaw, latestTrackerMessageId);
     }
     inlineProcessor.processAll();
-    setStatus(`Previewing template: ${preset.templateName}`);
+    setStatus(`Previewing template: ${preset.templateName}. Click Save Settings to keep it.`);
   });
 
   saveButton?.addEventListener("click", () => {
@@ -2440,7 +2445,7 @@ export function setup(ctx: SpindleFrontendContext) {
     configTrackerTagNameHint = config.trackerTagName;
     applyTagInterceptor();
     inlineProcessor.processAll();
-    setStatus("Config saved");
+    setStatus("Saving settings...");
   });
 
   const exportButton = byId<HTMLElement>("sst-lumi-export");
