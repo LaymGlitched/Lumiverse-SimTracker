@@ -18,14 +18,12 @@ var __toESM = (mod, isNodeMode, target) => {
   }
   target = mod != null ? __create(__getProtoOf(mod)) : {};
   const to = isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target;
-  if (mod && typeof mod === "object" || typeof mod === "function") {
-    for (let key of __getOwnPropNames(mod))
-      if (!__hasOwnProp.call(to, key))
-        __defProp(to, key, {
-          get: __accessProp.bind(mod, key),
-          enumerable: true
-        });
-  }
+  for (let key of __getOwnPropNames(mod))
+    if (!__hasOwnProp.call(to, key))
+      __defProp(to, key, {
+        get: __accessProp.bind(mod, key),
+        enumerable: true
+      });
   if (canCache)
     cache.set(mod, to);
   return to;
@@ -33,7 +31,7 @@ var __toESM = (mod, isNodeMode, target) => {
 var __commonJS = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
 
 // node_modules/handlebars/dist/cjs/handlebars/utils.js
-var require_utils = __commonJS(function(exports) {
+var require_utils = __commonJS((exports) => {
   exports.__esModule = true;
   exports.extend = extend;
   exports.indexOf = indexOf;
@@ -129,7 +127,7 @@ var require_utils = __commonJS(function(exports) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/exception.js
-var require_exception = __commonJS(function(exports, module) {
+var require_exception = __commonJS((exports, module) => {
   exports.__esModule = true;
   var errorProps = ["description", "fileName", "lineNumber", "endLineNumber", "message", "name", "number", "stack"];
   function Exception(message, node) {
@@ -174,7 +172,7 @@ var require_exception = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/helpers/block-helper-missing.js
-var require_block_helper_missing = __commonJS(function(exports, module) {
+var require_block_helper_missing = __commonJS((exports, module) => {
   exports.__esModule = true;
   var _utils = require_utils();
   exports.default = function(instance) {
@@ -207,7 +205,7 @@ var require_block_helper_missing = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/helpers/each.js
-var require_each = __commonJS(function(exports, module) {
+var require_each = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -288,7 +286,7 @@ var require_each = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/helpers/helper-missing.js
-var require_helper_missing = __commonJS(function(exports, module) {
+var require_helper_missing = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -308,7 +306,7 @@ var require_helper_missing = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/helpers/if.js
-var require_if = __commonJS(function(exports, module) {
+var require_if = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -345,7 +343,7 @@ var require_if = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/helpers/log.js
-var require_log = __commonJS(function(exports, module) {
+var require_log = __commonJS((exports, module) => {
   exports.__esModule = true;
   exports.default = function(instance) {
     instance.registerHelper("log", function() {
@@ -367,7 +365,7 @@ var require_log = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/helpers/lookup.js
-var require_lookup = __commonJS(function(exports, module) {
+var require_lookup = __commonJS((exports, module) => {
   exports.__esModule = true;
   exports.default = function(instance) {
     instance.registerHelper("lookup", function(obj, field, options) {
@@ -381,7 +379,7 @@ var require_lookup = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/helpers/with.js
-var require_with = __commonJS(function(exports, module) {
+var require_with = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -417,7 +415,7 @@ var require_with = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/helpers.js
-var require_helpers = __commonJS(function(exports) {
+var require_helpers = __commonJS((exports) => {
   exports.__esModule = true;
   exports.registerDefaultHelpers = registerDefaultHelpers;
   exports.moveHelperToHooks = moveHelperToHooks;
@@ -458,7 +456,7 @@ var require_helpers = __commonJS(function(exports) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/decorators/inline.js
-var require_inline = __commonJS(function(exports, module) {
+var require_inline = __commonJS((exports, module) => {
   exports.__esModule = true;
   var _utils = require_utils();
   exports.default = function(instance) {
@@ -482,7 +480,7 @@ var require_inline = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/decorators.js
-var require_decorators = __commonJS(function(exports) {
+var require_decorators = __commonJS((exports) => {
   exports.__esModule = true;
   exports.registerDefaultDecorators = registerDefaultDecorators;
   function _interopRequireDefault(obj) {
@@ -496,7 +494,7 @@ var require_decorators = __commonJS(function(exports) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/logger.js
-var require_logger = __commonJS(function(exports, module) {
+var require_logger = __commonJS((exports, module) => {
   exports.__esModule = true;
   var _utils = require_utils();
   var logger = {
@@ -532,7 +530,7 @@ var require_logger = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/internal/create-new-lookup-object.js
-var require_create_new_lookup_object = __commonJS(function(exports) {
+var require_create_new_lookup_object = __commonJS((exports) => {
   exports.__esModule = true;
   exports.createNewLookupObject = createNewLookupObject;
   var _utils = require_utils();
@@ -545,7 +543,7 @@ var require_create_new_lookup_object = __commonJS(function(exports) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/internal/proto-access.js
-var require_proto_access = __commonJS(function(exports) {
+var require_proto_access = __commonJS((exports) => {
   exports.__esModule = true;
   exports.createProtoAccessControl = createProtoAccessControl;
   exports.resultIsAllowed = resultIsAllowed;
@@ -609,7 +607,7 @@ var require_proto_access = __commonJS(function(exports) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/base.js
-var require_base = __commonJS(function(exports) {
+var require_base = __commonJS((exports) => {
   exports.__esModule = true;
   exports.HandlebarsEnvironment = HandlebarsEnvironment;
   function _interopRequireDefault(obj) {
@@ -702,7 +700,7 @@ var require_base = __commonJS(function(exports) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/safe-string.js
-var require_safe_string = __commonJS(function(exports, module) {
+var require_safe_string = __commonJS((exports, module) => {
   exports.__esModule = true;
   function SafeString(string) {
     this.string = string;
@@ -715,7 +713,7 @@ var require_safe_string = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/internal/wrapHelper.js
-var require_wrapHelper = __commonJS(function(exports) {
+var require_wrapHelper = __commonJS((exports) => {
   exports.__esModule = true;
   exports.wrapHelper = wrapHelper;
   function wrapHelper(helper, transformOptionsFn) {
@@ -732,7 +730,7 @@ var require_wrapHelper = __commonJS(function(exports) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/runtime.js
-var require_runtime = __commonJS(function(exports) {
+var require_runtime = __commonJS((exports) => {
   exports.__esModule = true;
   exports.checkRevision = checkRevision;
   exports.template = template;
@@ -1040,7 +1038,7 @@ var require_runtime = __commonJS(function(exports) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/no-conflict.js
-var require_no_conflict = __commonJS(function(exports, module) {
+var require_no_conflict = __commonJS((exports, module) => {
   exports.__esModule = true;
   exports.default = function(Handlebars) {
     (function() {
@@ -1064,7 +1062,7 @@ var require_no_conflict = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars.runtime.js
-var require_handlebars_runtime = __commonJS(function(exports, module) {
+var require_handlebars_runtime = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -1118,7 +1116,7 @@ var require_handlebars_runtime = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/compiler/ast.js
-var require_ast = __commonJS(function(exports, module) {
+var require_ast = __commonJS((exports, module) => {
   exports.__esModule = true;
   var AST = {
     helpers: {
@@ -1138,7 +1136,7 @@ var require_ast = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/compiler/parser.js
-var require_parser = __commonJS(function(exports, module) {
+var require_parser = __commonJS((exports, module) => {
   exports.__esModule = true;
   var handlebars = function() {
     var parser = {
@@ -1862,7 +1860,7 @@ Expecting ` + expected.join(", ") + ", got '" + (this.terminals_[symbol] || symb
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/compiler/visitor.js
-var require_visitor = __commonJS(function(exports, module) {
+var require_visitor = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -1967,7 +1965,7 @@ var require_visitor = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/compiler/whitespace-control.js
-var require_whitespace_control = __commonJS(function(exports, module) {
+var require_whitespace_control = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -2113,7 +2111,7 @@ var require_whitespace_control = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/compiler/helpers.js
-var require_helpers2 = __commonJS(function(exports) {
+var require_helpers2 = __commonJS((exports) => {
   exports.__esModule = true;
   exports.SourceLocation = SourceLocation;
   exports.id = id;
@@ -2298,7 +2296,7 @@ var require_helpers2 = __commonJS(function(exports) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/compiler/base.js
-var require_base2 = __commonJS(function(exports) {
+var require_base2 = __commonJS((exports) => {
   exports.__esModule = true;
   exports.parseWithoutProcessing = parseWithoutProcessing;
   exports.parse = parse;
@@ -2349,7 +2347,7 @@ var require_base2 = __commonJS(function(exports) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/compiler/compiler.js
-var require_compiler = __commonJS(function(exports) {
+var require_compiler = __commonJS((exports) => {
   exports.__esModule = true;
   exports.Compiler = Compiler;
   exports.precompile = precompile;
@@ -2766,7 +2764,7 @@ var require_compiler = __commonJS(function(exports) {
 });
 
 // node_modules/source-map/lib/base64.js
-var require_base64 = __commonJS(function(exports) {
+var require_base64 = __commonJS((exports) => {
   var intToCharMap = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".split("");
   exports.encode = function(number) {
     if (0 <= number && number < intToCharMap.length) {
@@ -2805,7 +2803,7 @@ var require_base64 = __commonJS(function(exports) {
 });
 
 // node_modules/source-map/lib/base64-vlq.js
-var require_base64_vlq = __commonJS(function(exports) {
+var require_base64_vlq = __commonJS((exports) => {
   var base64 = require_base64();
   var VLQ_BASE_SHIFT = 5;
   var VLQ_BASE = 1 << VLQ_BASE_SHIFT;
@@ -2857,7 +2855,7 @@ var require_base64_vlq = __commonJS(function(exports) {
 });
 
 // node_modules/source-map/lib/util.js
-var require_util = __commonJS(function(exports) {
+var require_util = __commonJS((exports) => {
   function getArg(aArgs, aName, aDefaultValue) {
     if (aName in aArgs) {
       return aArgs[aName];
@@ -3156,7 +3154,7 @@ var require_util = __commonJS(function(exports) {
 });
 
 // node_modules/source-map/lib/array-set.js
-var require_array_set = __commonJS(function(exports) {
+var require_array_set = __commonJS((exports) => {
   var util = require_util();
   var has = Object.prototype.hasOwnProperty;
   var hasNativeMap = typeof Map !== "undefined";
@@ -3224,7 +3222,7 @@ var require_array_set = __commonJS(function(exports) {
 });
 
 // node_modules/source-map/lib/mapping-list.js
-var require_mapping_list = __commonJS(function(exports) {
+var require_mapping_list = __commonJS((exports) => {
   var util = require_util();
   function generatedPositionAfter(mappingA, mappingB) {
     var lineA = mappingA.generatedLine;
@@ -3261,7 +3259,7 @@ var require_mapping_list = __commonJS(function(exports) {
 });
 
 // node_modules/source-map/lib/source-map-generator.js
-var require_source_map_generator = __commonJS(function(exports) {
+var require_source_map_generator = __commonJS((exports) => {
   var base64VLQ = require_base64_vlq();
   var util = require_util();
   var ArraySet = require_array_set().ArraySet;
@@ -3531,7 +3529,7 @@ var require_source_map_generator = __commonJS(function(exports) {
 });
 
 // node_modules/source-map/lib/binary-search.js
-var require_binary_search = __commonJS(function(exports) {
+var require_binary_search = __commonJS((exports) => {
   exports.GREATEST_LOWER_BOUND = 1;
   exports.LEAST_UPPER_BOUND = 2;
   function recursiveSearch(aLow, aHigh, aNeedle, aHaystack, aCompare, aBias) {
@@ -3578,7 +3576,7 @@ var require_binary_search = __commonJS(function(exports) {
 });
 
 // node_modules/source-map/lib/quick-sort.js
-var require_quick_sort = __commonJS(function(exports) {
+var require_quick_sort = __commonJS((exports) => {
   function swap(ary, x, y) {
     var temp = ary[x];
     ary[x] = ary[y];
@@ -3611,7 +3609,7 @@ var require_quick_sort = __commonJS(function(exports) {
 });
 
 // node_modules/source-map/lib/source-map-consumer.js
-var require_source_map_consumer = __commonJS(function(exports) {
+var require_source_map_consumer = __commonJS((exports) => {
   var util = require_util();
   var binarySearch = require_binary_search();
   var ArraySet = require_array_set().ArraySet;
@@ -4180,7 +4178,7 @@ var require_source_map_consumer = __commonJS(function(exports) {
 });
 
 // node_modules/source-map/lib/source-node.js
-var require_source_node = __commonJS(function(exports) {
+var require_source_node = __commonJS((exports) => {
   var SourceMapGenerator = require_source_map_generator().SourceMapGenerator;
   var util = require_util();
   var REGEX_NEWLINE = /(\r?\n)/;
@@ -4434,14 +4432,14 @@ var require_source_node = __commonJS(function(exports) {
 });
 
 // node_modules/source-map/source-map.js
-var require_source_map = __commonJS(function(exports) {
+var require_source_map = __commonJS((exports) => {
   exports.SourceMapGenerator = require_source_map_generator().SourceMapGenerator;
   exports.SourceMapConsumer = require_source_map_consumer().SourceMapConsumer;
   exports.SourceNode = require_source_node().SourceNode;
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/compiler/code-gen.js
-var require_code_gen = __commonJS(function(exports, module) {
+var require_code_gen = __commonJS((exports, module) => {
   exports.__esModule = true;
   var _utils = require_utils();
   var SourceNode = undefined;
@@ -4574,7 +4572,7 @@ var require_code_gen = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/compiler/javascript-compiler.js
-var require_javascript_compiler = __commonJS(function(exports, module) {
+var require_javascript_compiler = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -5340,7 +5338,7 @@ var require_javascript_compiler = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars.js
-var require_handlebars = __commonJS(function(exports, module) {
+var require_handlebars = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -10511,7 +10509,7 @@ TEMPLATE VARIABLES (tabbed mode):
   },
   trackerDesc: "Narrative character tracker with fertility, womb fullness, semen volume, and refractory gauges."
 };
-// custom/narrative-weave-simtracker.json
+// tracker-card-templates/narrative-weave-simtracker.json
 var narrative_weave_simtracker_default = {
   templateName: "Narrative Weave SimTracker",
   templateAuthor: "c0re",

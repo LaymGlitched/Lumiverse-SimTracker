@@ -5125,7 +5125,7 @@ TEMPLATE VARIABLES (tabbed mode):
   },
   trackerDesc: "Narrative character tracker with fertility, womb fullness, semen volume, and refractory gauges."
 };
-// custom/narrative-weave-simtracker.json
+// tracker-card-templates/narrative-weave-simtracker.json
 var narrative_weave_simtracker_default = {
   templateName: "Narrative Weave SimTracker",
   templateAuthor: "c0re",
