@@ -18,14 +18,12 @@ var __toESM = (mod, isNodeMode, target) => {
   }
   target = mod != null ? __create(__getProtoOf(mod)) : {};
   const to = isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target;
-  if (mod && typeof mod === "object" || typeof mod === "function") {
-    for (let key of __getOwnPropNames(mod))
-      if (!__hasOwnProp.call(to, key))
-        __defProp(to, key, {
-          get: __accessProp.bind(mod, key),
-          enumerable: true
-        });
-  }
+  for (let key of __getOwnPropNames(mod))
+    if (!__hasOwnProp.call(to, key))
+      __defProp(to, key, {
+        get: __accessProp.bind(mod, key),
+        enumerable: true
+      });
   if (canCache)
     cache.set(mod, to);
   return to;
@@ -33,7 +31,7 @@ var __toESM = (mod, isNodeMode, target) => {
 var __commonJS = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
 
 // node_modules/handlebars/dist/cjs/handlebars/utils.js
-var require_utils = __commonJS(function(exports) {
+var require_utils = __commonJS((exports) => {
   exports.__esModule = true;
   exports.extend = extend;
   exports.indexOf = indexOf;
@@ -129,7 +127,7 @@ var require_utils = __commonJS(function(exports) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/exception.js
-var require_exception = __commonJS(function(exports, module) {
+var require_exception = __commonJS((exports, module) => {
   exports.__esModule = true;
   var errorProps = ["description", "fileName", "lineNumber", "endLineNumber", "message", "name", "number", "stack"];
   function Exception(message, node) {
@@ -174,7 +172,7 @@ var require_exception = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/helpers/block-helper-missing.js
-var require_block_helper_missing = __commonJS(function(exports, module) {
+var require_block_helper_missing = __commonJS((exports, module) => {
   exports.__esModule = true;
   var _utils = require_utils();
   exports.default = function(instance) {
@@ -207,7 +205,7 @@ var require_block_helper_missing = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/helpers/each.js
-var require_each = __commonJS(function(exports, module) {
+var require_each = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -288,7 +286,7 @@ var require_each = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/helpers/helper-missing.js
-var require_helper_missing = __commonJS(function(exports, module) {
+var require_helper_missing = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -308,7 +306,7 @@ var require_helper_missing = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/helpers/if.js
-var require_if = __commonJS(function(exports, module) {
+var require_if = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -345,7 +343,7 @@ var require_if = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/helpers/log.js
-var require_log = __commonJS(function(exports, module) {
+var require_log = __commonJS((exports, module) => {
   exports.__esModule = true;
   exports.default = function(instance) {
     instance.registerHelper("log", function() {
@@ -367,7 +365,7 @@ var require_log = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/helpers/lookup.js
-var require_lookup = __commonJS(function(exports, module) {
+var require_lookup = __commonJS((exports, module) => {
   exports.__esModule = true;
   exports.default = function(instance) {
     instance.registerHelper("lookup", function(obj, field, options) {
@@ -381,7 +379,7 @@ var require_lookup = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/helpers/with.js
-var require_with = __commonJS(function(exports, module) {
+var require_with = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -417,7 +415,7 @@ var require_with = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/helpers.js
-var require_helpers = __commonJS(function(exports) {
+var require_helpers = __commonJS((exports) => {
   exports.__esModule = true;
   exports.registerDefaultHelpers = registerDefaultHelpers;
   exports.moveHelperToHooks = moveHelperToHooks;
@@ -458,7 +456,7 @@ var require_helpers = __commonJS(function(exports) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/decorators/inline.js
-var require_inline = __commonJS(function(exports, module) {
+var require_inline = __commonJS((exports, module) => {
   exports.__esModule = true;
   var _utils = require_utils();
   exports.default = function(instance) {
@@ -482,7 +480,7 @@ var require_inline = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/decorators.js
-var require_decorators = __commonJS(function(exports) {
+var require_decorators = __commonJS((exports) => {
   exports.__esModule = true;
   exports.registerDefaultDecorators = registerDefaultDecorators;
   function _interopRequireDefault(obj) {
@@ -496,7 +494,7 @@ var require_decorators = __commonJS(function(exports) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/logger.js
-var require_logger = __commonJS(function(exports, module) {
+var require_logger = __commonJS((exports, module) => {
   exports.__esModule = true;
   var _utils = require_utils();
   var logger = {
@@ -532,7 +530,7 @@ var require_logger = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/internal/create-new-lookup-object.js
-var require_create_new_lookup_object = __commonJS(function(exports) {
+var require_create_new_lookup_object = __commonJS((exports) => {
   exports.__esModule = true;
   exports.createNewLookupObject = createNewLookupObject;
   var _utils = require_utils();
@@ -545,7 +543,7 @@ var require_create_new_lookup_object = __commonJS(function(exports) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/internal/proto-access.js
-var require_proto_access = __commonJS(function(exports) {
+var require_proto_access = __commonJS((exports) => {
   exports.__esModule = true;
   exports.createProtoAccessControl = createProtoAccessControl;
   exports.resultIsAllowed = resultIsAllowed;
@@ -609,7 +607,7 @@ var require_proto_access = __commonJS(function(exports) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/base.js
-var require_base = __commonJS(function(exports) {
+var require_base = __commonJS((exports) => {
   exports.__esModule = true;
   exports.HandlebarsEnvironment = HandlebarsEnvironment;
   function _interopRequireDefault(obj) {
@@ -702,7 +700,7 @@ var require_base = __commonJS(function(exports) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/safe-string.js
-var require_safe_string = __commonJS(function(exports, module) {
+var require_safe_string = __commonJS((exports, module) => {
   exports.__esModule = true;
   function SafeString(string) {
     this.string = string;
@@ -715,7 +713,7 @@ var require_safe_string = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/internal/wrapHelper.js
-var require_wrapHelper = __commonJS(function(exports) {
+var require_wrapHelper = __commonJS((exports) => {
   exports.__esModule = true;
   exports.wrapHelper = wrapHelper;
   function wrapHelper(helper, transformOptionsFn) {
@@ -732,7 +730,7 @@ var require_wrapHelper = __commonJS(function(exports) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/runtime.js
-var require_runtime = __commonJS(function(exports) {
+var require_runtime = __commonJS((exports) => {
   exports.__esModule = true;
   exports.checkRevision = checkRevision;
   exports.template = template;
@@ -1040,7 +1038,7 @@ var require_runtime = __commonJS(function(exports) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/no-conflict.js
-var require_no_conflict = __commonJS(function(exports, module) {
+var require_no_conflict = __commonJS((exports, module) => {
   exports.__esModule = true;
   exports.default = function(Handlebars) {
     (function() {
@@ -1064,7 +1062,7 @@ var require_no_conflict = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars.runtime.js
-var require_handlebars_runtime = __commonJS(function(exports, module) {
+var require_handlebars_runtime = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -1118,7 +1116,7 @@ var require_handlebars_runtime = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/compiler/ast.js
-var require_ast = __commonJS(function(exports, module) {
+var require_ast = __commonJS((exports, module) => {
   exports.__esModule = true;
   var AST = {
     helpers: {
@@ -1138,7 +1136,7 @@ var require_ast = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/compiler/parser.js
-var require_parser = __commonJS(function(exports, module) {
+var require_parser = __commonJS((exports, module) => {
   exports.__esModule = true;
   var handlebars = function() {
     var parser = {
@@ -1862,7 +1860,7 @@ Expecting ` + expected.join(", ") + ", got '" + (this.terminals_[symbol] || symb
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/compiler/visitor.js
-var require_visitor = __commonJS(function(exports, module) {
+var require_visitor = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -1967,7 +1965,7 @@ var require_visitor = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/compiler/whitespace-control.js
-var require_whitespace_control = __commonJS(function(exports, module) {
+var require_whitespace_control = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -2113,7 +2111,7 @@ var require_whitespace_control = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/compiler/helpers.js
-var require_helpers2 = __commonJS(function(exports) {
+var require_helpers2 = __commonJS((exports) => {
   exports.__esModule = true;
   exports.SourceLocation = SourceLocation;
   exports.id = id;
@@ -2298,7 +2296,7 @@ var require_helpers2 = __commonJS(function(exports) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/compiler/base.js
-var require_base2 = __commonJS(function(exports) {
+var require_base2 = __commonJS((exports) => {
   exports.__esModule = true;
   exports.parseWithoutProcessing = parseWithoutProcessing;
   exports.parse = parse;
@@ -2349,7 +2347,7 @@ var require_base2 = __commonJS(function(exports) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/compiler/compiler.js
-var require_compiler = __commonJS(function(exports) {
+var require_compiler = __commonJS((exports) => {
   exports.__esModule = true;
   exports.Compiler = Compiler;
   exports.precompile = precompile;
@@ -2766,7 +2764,7 @@ var require_compiler = __commonJS(function(exports) {
 });
 
 // node_modules/source-map/lib/base64.js
-var require_base64 = __commonJS(function(exports) {
+var require_base64 = __commonJS((exports) => {
   var intToCharMap = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".split("");
   exports.encode = function(number) {
     if (0 <= number && number < intToCharMap.length) {
@@ -2805,7 +2803,7 @@ var require_base64 = __commonJS(function(exports) {
 });
 
 // node_modules/source-map/lib/base64-vlq.js
-var require_base64_vlq = __commonJS(function(exports) {
+var require_base64_vlq = __commonJS((exports) => {
   var base64 = require_base64();
   var VLQ_BASE_SHIFT = 5;
   var VLQ_BASE = 1 << VLQ_BASE_SHIFT;
@@ -2857,7 +2855,7 @@ var require_base64_vlq = __commonJS(function(exports) {
 });
 
 // node_modules/source-map/lib/util.js
-var require_util = __commonJS(function(exports) {
+var require_util = __commonJS((exports) => {
   function getArg(aArgs, aName, aDefaultValue) {
     if (aName in aArgs) {
       return aArgs[aName];
@@ -3156,7 +3154,7 @@ var require_util = __commonJS(function(exports) {
 });
 
 // node_modules/source-map/lib/array-set.js
-var require_array_set = __commonJS(function(exports) {
+var require_array_set = __commonJS((exports) => {
   var util = require_util();
   var has = Object.prototype.hasOwnProperty;
   var hasNativeMap = typeof Map !== "undefined";
@@ -3224,7 +3222,7 @@ var require_array_set = __commonJS(function(exports) {
 });
 
 // node_modules/source-map/lib/mapping-list.js
-var require_mapping_list = __commonJS(function(exports) {
+var require_mapping_list = __commonJS((exports) => {
   var util = require_util();
   function generatedPositionAfter(mappingA, mappingB) {
     var lineA = mappingA.generatedLine;
@@ -3261,7 +3259,7 @@ var require_mapping_list = __commonJS(function(exports) {
 });
 
 // node_modules/source-map/lib/source-map-generator.js
-var require_source_map_generator = __commonJS(function(exports) {
+var require_source_map_generator = __commonJS((exports) => {
   var base64VLQ = require_base64_vlq();
   var util = require_util();
   var ArraySet = require_array_set().ArraySet;
@@ -3531,7 +3529,7 @@ var require_source_map_generator = __commonJS(function(exports) {
 });
 
 // node_modules/source-map/lib/binary-search.js
-var require_binary_search = __commonJS(function(exports) {
+var require_binary_search = __commonJS((exports) => {
   exports.GREATEST_LOWER_BOUND = 1;
   exports.LEAST_UPPER_BOUND = 2;
   function recursiveSearch(aLow, aHigh, aNeedle, aHaystack, aCompare, aBias) {
@@ -3578,7 +3576,7 @@ var require_binary_search = __commonJS(function(exports) {
 });
 
 // node_modules/source-map/lib/quick-sort.js
-var require_quick_sort = __commonJS(function(exports) {
+var require_quick_sort = __commonJS((exports) => {
   function swap(ary, x, y) {
     var temp = ary[x];
     ary[x] = ary[y];
@@ -3611,7 +3609,7 @@ var require_quick_sort = __commonJS(function(exports) {
 });
 
 // node_modules/source-map/lib/source-map-consumer.js
-var require_source_map_consumer = __commonJS(function(exports) {
+var require_source_map_consumer = __commonJS((exports) => {
   var util = require_util();
   var binarySearch = require_binary_search();
   var ArraySet = require_array_set().ArraySet;
@@ -4180,7 +4178,7 @@ var require_source_map_consumer = __commonJS(function(exports) {
 });
 
 // node_modules/source-map/lib/source-node.js
-var require_source_node = __commonJS(function(exports) {
+var require_source_node = __commonJS((exports) => {
   var SourceMapGenerator = require_source_map_generator().SourceMapGenerator;
   var util = require_util();
   var REGEX_NEWLINE = /(\r?\n)/;
@@ -4434,14 +4432,14 @@ var require_source_node = __commonJS(function(exports) {
 });
 
 // node_modules/source-map/source-map.js
-var require_source_map = __commonJS(function(exports) {
+var require_source_map = __commonJS((exports) => {
   exports.SourceMapGenerator = require_source_map_generator().SourceMapGenerator;
   exports.SourceMapConsumer = require_source_map_consumer().SourceMapConsumer;
   exports.SourceNode = require_source_node().SourceNode;
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/compiler/code-gen.js
-var require_code_gen = __commonJS(function(exports, module) {
+var require_code_gen = __commonJS((exports, module) => {
   exports.__esModule = true;
   var _utils = require_utils();
   var SourceNode = undefined;
@@ -4574,7 +4572,7 @@ var require_code_gen = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars/compiler/javascript-compiler.js
-var require_javascript_compiler = __commonJS(function(exports, module) {
+var require_javascript_compiler = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -5340,7 +5338,7 @@ var require_javascript_compiler = __commonJS(function(exports, module) {
 });
 
 // node_modules/handlebars/dist/cjs/handlebars.js
-var require_handlebars = __commonJS(function(exports, module) {
+var require_handlebars = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -10511,6 +10509,1307 @@ TEMPLATE VARIABLES (tabbed mode):
   },
   trackerDesc: "Narrative character tracker with fertility, womb fullness, semen volume, and refractory gauges."
 };
+// custom/narrative-weave-simtracker.json
+var narrative_weave_simtracker_default = {
+  templateName: "Narrative Weave SimTracker",
+  templateAuthor: "c0re",
+  trackerDesc: "A narrative relationship and plot momentum tracker for up to four NPCs plus a separate world and story state.",
+  templatePosition: "BOTTOM",
+  displayInstructions: "Use the text_messages inline display when narrating in-world SMS or chat exchanges.",
+  inlineTemplatesEnabled: true,
+  inlineTemplates: [
+    {
+      insertName: "text_messages",
+      insertPurpose: "Render an in-world SMS/chat thread with inbound and outbound bubbles.",
+      parameters: [
+        {
+          name: "contact",
+          description: "Contact name, group name, or number shown in the thread header."
+        },
+        {
+          name: "device",
+          description: "Optional app/device label such as Messages, Signal, or encrypted chat."
+        },
+        {
+          name: "time",
+          description: "Optional header timestamp for the current message moment."
+        },
+        {
+          name: "status",
+          description: "Optional delivery/read status shown at the bottom."
+        },
+        {
+          name: "typing",
+          description: "Optional name or label for a contact who is currently typing."
+        },
+        {
+          name: "context",
+          description: "Optional short thread context, warning, or prior-history note."
+        },
+        {
+          name: "accent",
+          description: "Optional hex color for the contact/avatar accent."
+        },
+        {
+          name: "messages",
+          description: "Array of message objects. Each object uses side sent/received, text, and optional sender, time, or reaction."
+        }
+      ],
+      htmlContent: "<div class='sst-inline-text-thread' style='display:block;margin:14px 0;max-width:440px;color:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;line-height:1.35;'><div style='padding:10px;border:1px solid rgba(148,163,184,0.28);border-radius:30px;background:linear-gradient(145deg,#111827 0%,#020617 100%);box-shadow:0 18px 45px rgba(0,0,0,0.34),inset 0 1px 0 rgba(255,255,255,0.08);'><div style='overflow:hidden;border:1px solid rgba(148,163,184,0.18);border-radius:24px;background:radial-gradient(circle at top left,rgba(56,189,248,0.16),transparent 34%),linear-gradient(180deg,#0f172a 0%,#111827 100%);'><div style='display:flex;align-items:center;gap:10px;padding:11px 12px;border-bottom:1px solid rgba(148,163,184,0.16);background:linear-gradient(180deg,rgba(255,255,255,0.09),rgba(255,255,255,0.02));'><div style='display:flex;align-items:center;justify-content:center;width:34px;height:34px;flex:0 0 34px;border-radius:50%;color:#fff;font-size:12px;font-weight:800;letter-spacing:0.04em;background:linear-gradient(135deg,{{#if accent}}{{accent}}{{else}}#38bdf8{{/if}},#8b5cf6);box-shadow:0 0 0 2px rgba(255,255,255,0.08),0 8px 18px rgba(56,189,248,0.22);'>{{#if contact}}{{initials contact}}{{else}}?{{/if}}</div><div style='min-width:0;flex:1;'><div style='overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#f8fafc;font-size:14px;font-weight:800;'>{{#if contact}}{{contact}}{{else}}Unknown Contact{{/if}}</div><div style='overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#94a3b8;font-size:11px;font-weight:650;'>{{#if device}}{{device}}{{else}}Messages{{/if}}{{#if context}} · {{context}}{{/if}}</div></div>{{#if time}}<div style='flex:0 0 auto;color:#cbd5e1;font-size:11px;font-weight:700;'>{{time}}</div>{{/if}}</div><div style='display:grid;gap:8px;padding:13px 12px 12px;'>{{#if messages}}{{#each messages}}<div style='display:flex;justify-content:{{#if (or (eq side 'sent') (eq side 's') (eq dir 's'))}}flex-end{{else}}flex-start{{/if}};'><div style='max-width:82%;min-width:0;{{#if (or (eq side 'sent') (eq side 's') (eq dir 's'))}}text-align:right;{{/if}}'>{{#if sender}}<div style='margin:0 6px 3px;color:#94a3b8;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;'>{{sender}}</div>{{/if}}<div style='display:inline-block;max-width:100%;padding:9px 11px;border-radius:{{#if (or (eq side 'sent') (eq side 's') (eq dir 's'))}}18px 18px 4px 18px{{else}}18px 18px 18px 4px{{/if}};color:{{#if (or (eq side 'sent') (eq side 's') (eq dir 's'))}}#ecfeff{{else}}#f8fafc{{/if}};background:{{#if (or (eq side 'sent') (eq side 's') (eq dir 's'))}}linear-gradient(135deg,#0891b2,#2563eb){{else}}rgba(30,41,59,0.96){{/if}};border:1px solid {{#if (or (eq side 'sent') (eq side 's') (eq dir 's'))}}rgba(125,211,252,0.26){{else}}rgba(148,163,184,0.16){{/if}};box-shadow:0 8px 18px rgba(0,0,0,0.18);font-size:13px;overflow-wrap:anywhere;text-align:left;'>{{text}}</div>{{#if (or time reaction)}}<div style='margin:3px 6px 0;color:#64748b;font-size:10px;font-weight:650;'>{{#if time}}{{time}}{{/if}}{{#if reaction}}{{#if time}} · {{/if}}{{reaction}}{{/if}}</div>{{/if}}</div></div>{{/each}}{{else}}<div style='padding:10px;border:1px dashed rgba(148,163,184,0.28);border-radius:14px;color:#94a3b8;font-size:12px;text-align:center;'>No message content supplied.</div>{{/if}}{{#if typing}}<div style='display:flex;align-items:center;gap:6px;color:#94a3b8;font-size:11px;font-weight:650;'><span style='width:7px;height:7px;border-radius:50%;background:#38bdf8;box-shadow:11px 0 0 rgba(56,189,248,0.65),22px 0 0 rgba(56,189,248,0.35);'></span><span style='margin-left:20px;'>{{typing}} is typing…</span></div>{{/if}}{{#if status}}<div style='padding-top:2px;color:#64748b;font-size:10px;font-weight:700;text-align:right;text-transform:uppercase;letter-spacing:0.08em;'>{{status}}</div>{{/if}}</div></div></div></div>"
+    }
+  ],
+  htmlTemplate: `<!-- TEMPLATE NAME: Narrative Weave SimTracker -->
+<!-- AUTHOR: c0re -->
+<!-- POSITION: BOTTOM -->
+
+<!-- CARD_TEMPLATE_START -->
+<style>
+  .nw-tracker {
+    --nw-bg: color-mix(in srgb, var(--lumiverse-bg, #17171c) 88%, #101116 12%);
+    --nw-surface: color-mix(in srgb, var(--lumiverse-fill-subtle, #25262d) 84%, transparent);
+    --nw-surface-strong: color-mix(in srgb, var(--lumiverse-fill, #30313a) 88%, transparent);
+    --nw-border: var(--lumiverse-border, rgba(255, 255, 255, 0.13));
+    --nw-border-hover: var(--lumiverse-border-hover, rgba(255, 255, 255, 0.24));
+    --nw-text: var(--lumiverse-text, #f4f4f6);
+    --nw-muted: var(--lumiverse-text-muted, #b4b5bd);
+    --nw-dim: var(--lumiverse-text-dim, #8a8c96);
+    --nw-focus: #5cc8be;
+    --nw-world-accent: #d5a84b;
+    --nw-ap: #e36d91;
+    --nw-dp: #ee8454;
+    --nw-tp: #49b8ae;
+    --nw-cp: #d15c5c;
+    --nw-beneficial: #55c98b;
+    --nw-detrimental: #ef6b72;
+    width: min(100%, 1100px);
+    margin: 14px auto;
+    color: var(--nw-text);
+    font-family: var(--lumiverse-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .nw-tracker,
+  .nw-tracker * {
+    box-sizing: border-box;
+  }
+
+  .nw-tracker-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .nw-panel {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--nw-border);
+    border-radius: 8px;
+    background: var(--nw-bg);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+    transition: border-color 180ms ease, box-shadow 180ms ease, opacity 180ms ease;
+  }
+
+  .nw-panel:hover {
+    border-color: var(--nw-border-hover);
+  }
+
+  .nw-panel[open] {
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.24);
+  }
+
+  .nw-world {
+    grid-column: 1 / -1;
+    border-top: 3px solid var(--nw-world-accent);
+  }
+
+  .nw-character {
+    --nw-accent: #6a5acd;
+    --nw-accent-dark: #423789;
+    border-top: 3px solid var(--nw-accent);
+  }
+
+  .nw-character > .nw-summary {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--nw-accent) 14%, var(--nw-surface)) 0%,
+      transparent 78%
+    );
+  }
+
+  .nw-character > .nw-summary:hover {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--nw-accent) 20%, var(--nw-surface-strong)) 0%,
+      transparent 80%
+    );
+  }
+
+  .nw-character.nw-inactive {
+    opacity: 0.68;
+  }
+
+  .nw-character.nw-inactive[open],
+  .nw-character.nw-inactive:hover {
+    opacity: 0.82;
+  }
+
+  .nw-summary {
+    position: relative;
+    display: grid;
+    gap: 7px;
+    min-height: 108px;
+    padding: 14px 42px 14px 16px;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    background: linear-gradient(135deg, var(--nw-surface) 0%, transparent 72%);
+  }
+
+  .nw-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .nw-summary::after {
+    content: "";
+    position: absolute;
+    top: 20px;
+    right: 18px;
+    width: 9px;
+    height: 9px;
+    border-right: 2px solid var(--nw-muted);
+    border-bottom: 2px solid var(--nw-muted);
+    transform: rotate(45deg);
+    transition: transform 180ms ease, border-color 180ms ease;
+  }
+
+  .nw-panel[open] > .nw-summary::after {
+    transform: rotate(225deg) translate(-2px, -2px);
+    border-color: var(--nw-text);
+  }
+
+  .nw-summary:hover {
+    background: linear-gradient(135deg, var(--nw-surface-strong) 0%, transparent 76%);
+  }
+
+  .nw-summary:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--nw-focus) 70%, transparent);
+    outline-offset: -3px;
+  }
+
+  .nw-hover-tooltip {
+    position: absolute;
+    z-index: 6;
+    padding: 8px 10px;
+    visibility: hidden;
+    border: 1px solid var(--nw-border-hover);
+    border-radius: 7px;
+    opacity: 0;
+    color: var(--nw-text);
+    background: color-mix(in srgb, var(--nw-bg) 96%, #000 4%);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: 0;
+    pointer-events: none;
+    text-transform: none;
+    transition: opacity 140ms ease, transform 140ms ease, visibility 140ms ease;
+  }
+
+  .nw-world-tooltip {
+    top: 50%;
+    left: 50%;
+    width: max-content;
+    max-width: calc(100% - 64px);
+    transform: translate(-50%, calc(-50% + 4px));
+    text-align: center;
+  }
+
+  .nw-world:not([open]) > .nw-summary:hover .nw-world-tooltip,
+  .nw-world:not([open]) > .nw-summary:focus-visible .nw-world-tooltip {
+    visibility: visible;
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+
+  .nw-summary-title {
+    min-width: 0;
+    margin: 0;
+    overflow-wrap: anywhere;
+    color: var(--nw-text);
+    font-size: 18px;
+    font-weight: 750;
+    line-height: 1.2;
+    letter-spacing: 0;
+  }
+
+  .nw-world-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 14px;
+  }
+
+  .nw-character-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 10px;
+    min-width: 0;
+  }
+
+  .nw-turn-updates {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+  }
+
+  .nw-change-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 25px;
+    padding: 3px 8px;
+    border: 1px solid var(--nw-border);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .nw-change-beneficial {
+    color: #9ce4bb;
+    border-color: color-mix(in srgb, var(--nw-beneficial) 55%, var(--nw-border));
+    background: color-mix(in srgb, var(--nw-beneficial) 14%, transparent);
+  }
+
+  .nw-change-detrimental {
+    color: #ffabb0;
+    border-color: color-mix(in srgb, var(--nw-detrimental) 55%, var(--nw-border));
+    background: color-mix(in srgb, var(--nw-detrimental) 14%, transparent);
+  }
+
+  .nw-day-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 25px;
+    padding: 3px 8px;
+    border: 1px solid color-mix(in srgb, var(--nw-world-accent) 46%, var(--nw-border));
+    border-radius: 999px;
+    color: #f0d08d;
+    background: color-mix(in srgb, var(--nw-world-accent) 14%, transparent);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .nw-mood {
+    color: var(--nw-muted);
+    font-size: 13px;
+    overflow-wrap: anywhere;
+  }
+
+  .nw-thought {
+    display: -webkit-box;
+    margin: 0;
+    overflow: hidden;
+    color: var(--nw-text);
+    font-size: 13px;
+    font-style: italic;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  .nw-character[open] > .nw-summary .nw-thought {
+    display: block;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+  }
+
+  .nw-thread {
+    margin: 0;
+    color: var(--nw-text);
+    font-size: 14px;
+    font-weight: 620;
+    overflow-wrap: anywhere;
+  }
+
+  .nw-body {
+    padding: 0 16px 16px;
+    border-top: 1px solid var(--nw-border);
+    animation: nw-body-in 180ms ease-out;
+  }
+
+  @keyframes nw-body-in {
+    from {
+      opacity: 0;
+      transform: translateY(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .nw-section {
+    padding-top: 14px;
+  }
+
+  .nw-section + .nw-section {
+    margin-top: 14px;
+    border-top: 1px solid var(--nw-border);
+  }
+
+  .nw-section-title {
+    margin: 0 0 9px;
+    color: var(--nw-dim);
+    font-size: 11px;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: 0;
+  }
+
+  .nw-meta-grid,
+  .nw-path-grid,
+  .nw-stat-grid {
+    display: grid;
+    gap: 8px;
+  }
+
+  .nw-meta-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .nw-path-grid,
+  .nw-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .nw-field,
+  .nw-path,
+  .nw-stat {
+    min-width: 0;
+    padding: 10px;
+    border: 1px solid var(--nw-border);
+    border-radius: 7px;
+    background: var(--nw-surface);
+  }
+
+  .nw-stat {
+    position: relative;
+  }
+
+  .nw-stat:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--nw-focus) 70%, transparent);
+    outline-offset: -3px;
+  }
+
+  .nw-stat-tooltip {
+    inset: 8px;
+    display: flex;
+    align-items: center;
+    transform: translateY(4px);
+  }
+
+  .nw-character[open] .nw-stat:hover .nw-stat-tooltip,
+  .nw-character[open] .nw-stat:focus-visible .nw-stat-tooltip {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .nw-field-label,
+  .nw-path-label,
+  .nw-stat-label {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--nw-dim);
+    font-size: 11px;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: 0;
+  }
+
+  .nw-field-value,
+  .nw-path-value {
+    color: var(--nw-text);
+    overflow-wrap: anywhere;
+  }
+
+  .nw-status-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .nw-attire {
+    margin-top: 10px;
+  }
+
+  .nw-attire .nw-field-value {
+    display: block;
+    line-height: 1.45;
+  }
+
+  .nw-status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 4px 9px;
+    border: 1px solid var(--nw-border);
+    border-radius: 999px;
+    color: var(--nw-text);
+    background: var(--nw-surface);
+    font-size: 12px;
+    font-weight: 650;
+  }
+
+  .nw-status-active {
+    border-color: color-mix(in srgb, #55c48d 50%, var(--nw-border));
+    color: #8ce1b2;
+  }
+
+  .nw-status-inactive {
+    border-color: color-mix(in srgb, #d6a14d 50%, var(--nw-border));
+    color: #ecc778;
+  }
+
+  .nw-stat-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .nw-stat-value {
+    color: var(--nw-text);
+    font-size: 15px;
+    font-weight: 800;
+  }
+
+  .nw-stat-numbers {
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .nw-stat-delta {
+    font-size: 12px;
+    font-weight: 850;
+  }
+
+  .nw-stat-delta-beneficial {
+    color: var(--nw-beneficial);
+  }
+
+  .nw-stat-delta-detrimental {
+    color: var(--nw-detrimental);
+  }
+
+  .nw-stat-status {
+    min-height: 34px;
+    margin-top: 5px;
+    color: var(--nw-muted);
+    font-size: 12px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  .nw-track {
+    position: relative;
+    height: 7px;
+    margin-top: 8px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--nw-text) 9%, transparent);
+  }
+
+  .nw-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    transition: width 280ms ease, left 280ms ease;
+  }
+
+  .nw-delta-segment {
+    z-index: 2;
+    box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.32);
+  }
+
+  .nw-delta-beneficial {
+    background: var(--nw-beneficial);
+  }
+
+  .nw-delta-detrimental {
+    background: var(--nw-detrimental);
+  }
+
+  .nw-fill-ap {
+    background: var(--nw-ap);
+  }
+
+  .nw-fill-dp {
+    background: var(--nw-dp);
+  }
+
+  .nw-fill-tp {
+    background: var(--nw-tp);
+  }
+
+  .nw-fill-cp {
+    background: var(--nw-cp);
+  }
+
+  .nw-list {
+    display: grid;
+    gap: 7px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .nw-list li {
+    position: relative;
+    padding-left: 15px;
+    color: var(--nw-text);
+    overflow-wrap: anywhere;
+  }
+
+  .nw-list li::before {
+    content: "";
+    position: absolute;
+    top: 0.6em;
+    left: 1px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--nw-world-accent);
+  }
+
+  .nw-empty {
+    color: var(--nw-dim);
+    font-style: italic;
+  }
+
+  .nw-momentum {
+    border-left: 3px solid var(--nw-focus);
+  }
+
+  .nw-selected-path {
+    border-color: color-mix(in srgb, var(--nw-focus) 50%, var(--nw-border));
+    background: color-mix(in srgb, var(--nw-focus) 10%, var(--nw-surface));
+  }
+
+  .nw-strategy {
+    grid-column: span 2;
+  }
+
+  @media (max-width: 720px) {
+    .nw-tracker {
+      margin: 10px auto;
+      font-size: 14px;
+    }
+
+    .nw-tracker-grid,
+    .nw-meta-grid,
+    .nw-path-grid,
+    .nw-stat-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .nw-world {
+      grid-column: auto;
+    }
+
+    .nw-strategy {
+      grid-column: auto;
+    }
+
+    .nw-summary {
+      min-height: 104px;
+      padding: 13px 38px 13px 13px;
+    }
+
+    .nw-body {
+      padding: 0 13px 13px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nw-tracker *,
+    .nw-tracker *::before,
+    .nw-tracker *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+</style>
+
+<section class="nw-tracker" aria-label="Narrative relationship and plot tracker">
+  <div class="nw-tracker-grid">
+    <details class="nw-panel nw-world">
+      <summary class="nw-summary">
+        <div class="nw-world-title">
+          <h2 class="nw-summary-title">
+            {{#if worldData.part_of_day}}{{worldData.part_of_day}}{{else}}Time of day unknown{{/if}}
+          </h2>
+          <span class="nw-day-chip">Day {{#if worldData.day_counter}}{{worldData.day_counter}}{{else}}1{{/if}}</span>
+        </div>
+        <p class="nw-thread">
+          {{#if worldData.immediate_narrative_thread}}
+            {{worldData.immediate_narrative_thread}}
+          {{else}}
+            No immediate narrative thread recorded.
+          {{/if}}
+        </p>
+        <span class="nw-hover-tooltip nw-world-tooltip" role="tooltip">
+          Date: {{#if worldData.current_date}}{{worldData.current_date}}{{else}}Unknown{{/if}}
+          · Time: {{#if worldData.current_time}}{{worldData.current_time}}{{else}}Unknown{{/if}}
+        </span>
+      </summary>
+
+      <div class="nw-body">
+        <section class="nw-section" aria-label="Timeline">
+          <h3 class="nw-section-title">Timeline</h3>
+          <div class="nw-meta-grid">
+            <div class="nw-field">
+              <span class="nw-field-label">Date</span>
+              <span class="nw-field-value">{{#if worldData.current_date}}{{worldData.current_date}}{{else}}Unknown{{/if}}</span>
+            </div>
+            <div class="nw-field">
+              <span class="nw-field-label">Time</span>
+              <span class="nw-field-value">{{#if worldData.current_time}}{{worldData.current_time}}{{else}}Unknown{{/if}}</span>
+            </div>
+            <div class="nw-field">
+              <span class="nw-field-label">Since first meeting</span>
+              <span class="nw-field-value">
+                {{#if worldData.days_since_first_meeting}}{{worldData.days_since_first_meeting}}{{else}}0{{/if}} days
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <section class="nw-section" aria-label="Narrative weave">
+          <h3 class="nw-section-title">Narrative weave</h3>
+          <div class="nw-meta-grid">
+            <div class="nw-field">
+              <span class="nw-field-label">Current arc</span>
+              <span class="nw-field-value">
+                {{#if worldData.current_narrative_arc}}{{worldData.current_narrative_arc}}{{else}}No current arc recorded.{{/if}}
+              </span>
+            </div>
+            <div class="nw-field">
+              <span class="nw-field-label">Completed weave</span>
+              <span class="nw-field-value">
+                {{#if worldData.completed_weave}}{{worldData.completed_weave}}{{else}}No resolved beat recorded.{{/if}}
+              </span>
+            </div>
+            <div class="nw-field">
+              <span class="nw-field-label">Parallel action</span>
+              <span class="nw-field-value">
+                {{#if worldData.parallel_actions}}{{worldData.parallel_actions}}{{else}}None in this scene window.{{/if}}
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <section class="nw-section" aria-label="Looming story beats">
+          <h3 class="nw-section-title">Looming story beats</h3>
+          {{#if worldData.looming_story_beats}}
+            <ul class="nw-list">
+              {{#each worldData.looming_story_beats}}
+                {{#if this}}<li>{{this}}</li>{{/if}}
+              {{/each}}
+            </ul>
+          {{else}}
+            <div class="nw-empty">No looming beats recorded.</div>
+          {{/if}}
+        </section>
+
+        <section class="nw-section nw-momentum" aria-label="Plot momentum">
+          <h3 class="nw-section-title">Plot momentum</h3>
+          <div class="nw-meta-grid">
+            <div class="nw-field">
+              <span class="nw-field-label">NPC agenda</span>
+              <span class="nw-field-value">
+                {{#if worldData.plot_momentum.npc_agenda}}{{worldData.plot_momentum.npc_agenda}}{{else}}No NPC agenda recorded.{{/if}}
+              </span>
+            </div>
+            <div class="nw-field">
+              <span class="nw-field-label">Scene physics</span>
+              <span class="nw-field-value">
+                {{#if worldData.plot_momentum.physics}}{{worldData.plot_momentum.physics}}{{else}}Positioning not recorded.{{/if}}
+              </span>
+            </div>
+            <div class="nw-field">
+              <span class="nw-field-label">Scene pacing</span>
+              <span class="nw-field-value">
+                {{#if worldData.plot_momentum.scene_pacing}}{{worldData.plot_momentum.scene_pacing}}{{else}}Steady{{/if}}
+              </span>
+            </div>
+          </div>
+
+          <div class="nw-path-grid" style="margin-top: 8px;">
+            <div class="nw-path">
+              <span class="nw-path-label">Path A · Default</span>
+              <span class="nw-path-value">
+                {{#if worldData.plot_momentum.next_path_options.path_a_default}}
+                  {{worldData.plot_momentum.next_path_options.path_a_default}}
+                {{else}}
+                  No path recorded.
+                {{/if}}
+              </span>
+            </div>
+            <div class="nw-path">
+              <span class="nw-path-label">Path B · Conflict</span>
+              <span class="nw-path-value">
+                {{#if worldData.plot_momentum.next_path_options.path_b_conflict}}
+                  {{worldData.plot_momentum.next_path_options.path_b_conflict}}
+                {{else}}
+                  No path recorded.
+                {{/if}}
+              </span>
+            </div>
+            <div class="nw-path">
+              <span class="nw-path-label">Path C · Action</span>
+              <span class="nw-path-value">
+                {{#if worldData.plot_momentum.next_path_options.path_c_action}}
+                  {{worldData.plot_momentum.next_path_options.path_c_action}}
+                {{else}}
+                  No path recorded.
+                {{/if}}
+              </span>
+            </div>
+            <div class="nw-path">
+              <span class="nw-path-label">Path D · Twist</span>
+              <span class="nw-path-value">
+                {{#if worldData.plot_momentum.next_path_options.path_d_twist}}
+                  {{worldData.plot_momentum.next_path_options.path_d_twist}}
+                {{else}}
+                  No path recorded.
+                {{/if}}
+              </span>
+            </div>
+          </div>
+
+          <div class="nw-meta-grid" style="margin-top: 8px;">
+            <div class="nw-field nw-selected-path">
+              <span class="nw-field-label">Selected path</span>
+              <span class="nw-field-value">
+                {{#if worldData.plot_momentum.selected_path}}{{worldData.plot_momentum.selected_path}}{{else}}Not selected{{/if}}
+              </span>
+            </div>
+            <div class="nw-field nw-strategy">
+              <span class="nw-field-label">Strategy reason</span>
+              <span class="nw-field-value">
+                {{#if worldData.plot_momentum.strategy_reason}}{{worldData.plot_momentum.strategy_reason}}{{else}}No strategy reason recorded.{{/if}}
+              </span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </details>
+
+    {{#each characters}}
+      <details
+        class="nw-panel nw-character {{#if stats.inactive}}nw-inactive{{/if}}"
+        style="--nw-accent: {{bgColor}}; --nw-accent-dark: {{darkerBgColor}};"
+      >
+        <summary class="nw-summary">
+          <div class="nw-character-title">
+            <h2 class="nw-summary-title">
+              {{#if characterName}}{{characterName}}{{else}}Unnamed NPC{{/if}}
+            </h2>
+            <div class="nw-turn-updates" aria-label="Changes this turn">
+              {{#if (eq stats.reaction 1)}}
+                <span class="nw-change-chip nw-change-beneficial" title="Mostly beneficial turn" aria-label="Mostly beneficial turn">👍</span>
+              {{else if (eq stats.reaction 2)}}
+                <span class="nw-change-chip nw-change-detrimental" title="Mostly detrimental turn" aria-label="Mostly detrimental turn">👎</span>
+              {{/if}}
+              {{#if stats.apChange}}
+                <span class="nw-change-chip {{#if (gt stats.apChange 0)}}nw-change-beneficial{{else}}nw-change-detrimental{{/if}}">AP {{#if (gt stats.apChange 0)}}+{{/if}}{{stats.apChange}}</span>
+              {{/if}}
+              {{#if stats.dpChange}}
+                <span class="nw-change-chip {{#if (gt stats.dpChange 0)}}nw-change-beneficial{{else}}nw-change-detrimental{{/if}}">DP {{#if (gt stats.dpChange 0)}}+{{/if}}{{stats.dpChange}}</span>
+              {{/if}}
+              {{#if stats.tpChange}}
+                <span class="nw-change-chip {{#if (gt stats.tpChange 0)}}nw-change-beneficial{{else}}nw-change-detrimental{{/if}}">TP {{#if (gt stats.tpChange 0)}}+{{/if}}{{stats.tpChange}}</span>
+              {{/if}}
+              {{#if stats.cpChange}}
+                <span class="nw-change-chip {{#if (lt stats.cpChange 0)}}nw-change-beneficial{{else}}nw-change-detrimental{{/if}}">CP {{#if (gt stats.cpChange 0)}}+{{/if}}{{stats.cpChange}}</span>
+              {{/if}}
+            </div>
+          </div>
+          <div class="nw-mood">
+            {{#if stats.mood}}{{stats.mood}}{{else}}Mood not recorded.{{/if}}
+          </div>
+          <p class="nw-thought">
+            {{#if stats.internal_thought}}{{stats.internal_thought}}{{else}}No internal thought recorded.{{/if}}
+          </p>
+        </summary>
+
+        <div class="nw-body">
+          <section class="nw-section" aria-label="Character state">
+            <h3 class="nw-section-title">Current state</h3>
+            <div class="nw-status-row">
+              {{#if stats.inactive}}
+                <span class="nw-status nw-status-inactive">
+                  {{#if (eq stats.inactive_reason 1)}}😴 Asleep
+                  {{else if (eq stats.inactive_reason 2)}}🏥 Comatose
+                  {{else if (eq stats.inactive_reason 3)}}😡 Contempt / anger
+                  {{else if (eq stats.inactive_reason 4)}}🫠 Incapacitated
+                  {{else if (eq stats.inactive_reason 5)}}🪦 Deceased
+                  {{else if (eq stats.inactiveReason 1)}}😴 Asleep
+                  {{else if (eq stats.inactiveReason 2)}}🏥 Comatose
+                  {{else if (eq stats.inactiveReason 3)}}😡 Contempt / anger
+                  {{else if (eq stats.inactiveReason 4)}}🫠 Incapacitated
+                  {{else if (eq stats.inactiveReason 5)}}🪦 Deceased
+                  {{else}}Unavailable{{/if}}
+                </span>
+              {{else}}
+                <span class="nw-status nw-status-active">● Active in scene</span>
+              {{/if}}
+
+              <span class="nw-status">
+                {{#if (eq stats.reaction 1)}}👍 Positive turn
+                {{else if (eq stats.reaction 2)}}👎 Negative turn
+                {{else if (eq stats.last_react 1)}}👍 Positive turn
+                {{else if (eq stats.last_react 2)}}👎 Negative turn
+                {{else}}😐 Neutral turn{{/if}}
+              </span>
+            </div>
+
+            <div class="nw-field nw-attire">
+              <span class="nw-field-label">Attire</span>
+              <span class="nw-field-value">
+                {{#if stats.attire}}{{stats.attire}}{{else}}Attire not recorded.{{/if}}
+              </span>
+            </div>
+          </section>
+
+          <section class="nw-section" aria-label="Relationship statistics">
+            <h3 class="nw-section-title">Relationship meters</h3>
+            <div class="nw-stat-grid">
+              <div class="nw-stat" tabindex="0">
+                <span class="nw-hover-tooltip nw-stat-tooltip" role="tooltip">Affection Points toward the user, 0-200 hard range; normal per-turn movement -5 to +2.</span>
+                <div class="nw-stat-head">
+                  <span class="nw-stat-label">AP · Affection</span>
+                  <span class="nw-stat-numbers">
+                    {{#if stats.apChange}}
+                      <span
+                        class="nw-stat-delta {{#if (gt stats.apChange 0)}}nw-stat-delta-beneficial{{else}}nw-stat-delta-detrimental{{/if}}"
+                        title="Affection changed by {{#if (gt stats.apChange 0)}}+{{/if}}{{stats.apChange}}"
+                      >{{#if (gt stats.apChange 0)}}+{{/if}}{{stats.apChange}}</span>
+                    {{/if}}
+                    <span class="nw-stat-value">{{#if stats.ap}}{{stats.ap}}{{else}}0{{/if}} / 200</span>
+                  </span>
+                </div>
+                <div class="nw-stat-status">
+                  {{#if stats.ap_status}}{{stats.ap_status}}{{else}}Strangers{{/if}}
+                </div>
+                <div class="nw-track" role="progressbar" aria-label="Affection points" aria-valuemin="0" aria-valuemax="200" aria-valuenow="{{#if stats.ap}}{{stats.ap}}{{else}}0{{/if}}">
+                  {{#if stats.apChange}}
+                    {{#if (gt stats.apChange 0)}}
+                      <div class="nw-fill nw-fill-ap" style="width: {{divide (subtract stats.ap stats.apChange) 2}}%;"></div>
+                      <div class="nw-fill nw-delta-segment nw-delta-beneficial" title="Affection gained: +{{stats.apChange}}" style="left: {{divide (subtract stats.ap stats.apChange) 2}}%; width: {{divide stats.apChange 2}}%;"></div>
+                    {{else}}
+                      <div class="nw-fill nw-fill-ap" style="width: {{divide stats.ap 2}}%;"></div>
+                      <div class="nw-fill nw-delta-segment nw-delta-detrimental" title="Affection lost: {{abs stats.apChange}}" style="left: {{divide stats.ap 2}}%; width: {{divide (abs stats.apChange) 2}}%;"></div>
+                    {{/if}}
+                  {{else}}
+                    <div class="nw-fill nw-fill-ap" style="width: {{divide stats.ap 2}}%;"></div>
+                  {{/if}}
+                </div>
+              </div>
+
+              <div class="nw-stat" tabindex="0">
+                <span class="nw-hover-tooltip nw-stat-tooltip" role="tooltip">Desire Points, 0-150 hard range; move in 5-point increments with absolute per-turn change -50 to +50.</span>
+                <div class="nw-stat-head">
+                  <span class="nw-stat-label">DP · Desire</span>
+                  <span class="nw-stat-numbers">
+                    {{#if stats.dpChange}}
+                      <span
+                        class="nw-stat-delta {{#if (gt stats.dpChange 0)}}nw-stat-delta-beneficial{{else}}nw-stat-delta-detrimental{{/if}}"
+                        title="Desire changed by {{#if (gt stats.dpChange 0)}}+{{/if}}{{stats.dpChange}}"
+                      >{{#if (gt stats.dpChange 0)}}+{{/if}}{{stats.dpChange}}</span>
+                    {{/if}}
+                    <span class="nw-stat-value">{{#if stats.dp}}{{stats.dp}}{{else}}0{{/if}} / 150</span>
+                  </span>
+                </div>
+                <div class="nw-stat-status">
+                  {{#if stats.dp_status}}{{stats.dp_status}}{{else}}Not feeling the heat{{/if}}
+                </div>
+                <div class="nw-track" role="progressbar" aria-label="Desire points" aria-valuemin="0" aria-valuemax="150" aria-valuenow="{{#if stats.dp}}{{stats.dp}}{{else}}0{{/if}}">
+                  {{#if stats.dpChange}}
+                    {{#if (gt stats.dpChange 0)}}
+                      <div class="nw-fill nw-fill-dp" style="width: {{divide (subtract stats.dp stats.dpChange) 1.5}}%;"></div>
+                      <div class="nw-fill nw-delta-segment nw-delta-beneficial" title="Desire gained: +{{stats.dpChange}}" style="left: {{divide (subtract stats.dp stats.dpChange) 1.5}}%; width: {{divide stats.dpChange 1.5}}%;"></div>
+                    {{else}}
+                      <div class="nw-fill nw-fill-dp" style="width: {{divide stats.dp 1.5}}%;"></div>
+                      <div class="nw-fill nw-delta-segment nw-delta-detrimental" title="Desire lost: {{abs stats.dpChange}}" style="left: {{divide stats.dp 1.5}}%; width: {{divide (abs stats.dpChange) 1.5}}%;"></div>
+                    {{/if}}
+                  {{else}}
+                    <div class="nw-fill nw-fill-dp" style="width: {{divide stats.dp 1.5}}%;"></div>
+                  {{/if}}
+                </div>
+              </div>
+
+              <div class="nw-stat" tabindex="0">
+                <span class="nw-hover-tooltip nw-stat-tooltip" role="tooltip">Trust Points toward the user, 0-150 hard range; normal per-turn movement -5 to +2 and absolute limit -50 to +50.</span>
+                <div class="nw-stat-head">
+                  <span class="nw-stat-label">TP · Trust</span>
+                  <span class="nw-stat-numbers">
+                    {{#if stats.tpChange}}
+                      <span
+                        class="nw-stat-delta {{#if (gt stats.tpChange 0)}}nw-stat-delta-beneficial{{else}}nw-stat-delta-detrimental{{/if}}"
+                        title="Trust changed by {{#if (gt stats.tpChange 0)}}+{{/if}}{{stats.tpChange}}"
+                      >{{#if (gt stats.tpChange 0)}}+{{/if}}{{stats.tpChange}}</span>
+                    {{/if}}
+                    <span class="nw-stat-value">{{#if stats.tp}}{{stats.tp}}{{else}}0{{/if}} / 150</span>
+                  </span>
+                </div>
+                <div class="nw-stat-status">Trust toward the player character.</div>
+                <div class="nw-track" role="progressbar" aria-label="Trust points" aria-valuemin="0" aria-valuemax="150" aria-valuenow="{{#if stats.tp}}{{stats.tp}}{{else}}0{{/if}}">
+                  {{#if stats.tpChange}}
+                    {{#if (gt stats.tpChange 0)}}
+                      <div class="nw-fill nw-fill-tp" style="width: {{divide (subtract stats.tp stats.tpChange) 1.5}}%;"></div>
+                      <div class="nw-fill nw-delta-segment nw-delta-beneficial" title="Trust gained: +{{stats.tpChange}}" style="left: {{divide (subtract stats.tp stats.tpChange) 1.5}}%; width: {{divide stats.tpChange 1.5}}%;"></div>
+                    {{else}}
+                      <div class="nw-fill nw-fill-tp" style="width: {{divide stats.tp 1.5}}%;"></div>
+                      <div class="nw-fill nw-delta-segment nw-delta-detrimental" title="Trust lost: {{abs stats.tpChange}}" style="left: {{divide stats.tp 1.5}}%; width: {{divide (abs stats.tpChange) 1.5}}%;"></div>
+                    {{/if}}
+                  {{else}}
+                    <div class="nw-fill nw-fill-tp" style="width: {{divide stats.tp 1.5}}%;"></div>
+                  {{/if}}
+                </div>
+              </div>
+
+              <div class="nw-stat" tabindex="0">
+                <span class="nw-hover-tooltip nw-stat-tooltip" role="tooltip">Contempt Points toward the user, 0-150 hard range; normal per-turn movement -5 to +2 and absolute limit -50 to +50.</span>
+                <div class="nw-stat-head">
+                  <span class="nw-stat-label">CP · Contempt</span>
+                  <span class="nw-stat-numbers">
+                    {{#if stats.cpChange}}
+                      <span
+                        class="nw-stat-delta {{#if (gt stats.cpChange 0)}}nw-stat-delta-detrimental{{else}}nw-stat-delta-beneficial{{/if}}"
+                        title="Contempt changed by {{#if (gt stats.cpChange 0)}}+{{/if}}{{stats.cpChange}}"
+                      >{{#if (gt stats.cpChange 0)}}+{{/if}}{{stats.cpChange}}</span>
+                    {{/if}}
+                    <span class="nw-stat-value">{{#if stats.cp}}{{stats.cp}}{{else}}0{{/if}} / 150</span>
+                  </span>
+                </div>
+                <div class="nw-stat-status">Contempt toward the player character.</div>
+                <div class="nw-track" role="progressbar" aria-label="Contempt points" aria-valuemin="0" aria-valuemax="150" aria-valuenow="{{#if stats.cp}}{{stats.cp}}{{else}}0{{/if}}">
+                  {{#if stats.cpChange}}
+                    {{#if (gt stats.cpChange 0)}}
+                      <div class="nw-fill nw-fill-cp" style="width: {{divide (subtract stats.cp stats.cpChange) 1.5}}%;"></div>
+                      <div class="nw-fill nw-delta-segment nw-delta-detrimental" title="Contempt increased: +{{stats.cpChange}}" style="left: {{divide (subtract stats.cp stats.cpChange) 1.5}}%; width: {{divide stats.cpChange 1.5}}%;"></div>
+                    {{else}}
+                      <div class="nw-fill nw-fill-cp" style="width: {{divide stats.cp 1.5}}%;"></div>
+                      <div class="nw-fill nw-delta-segment nw-delta-beneficial" title="Contempt decreased: {{abs stats.cpChange}}" style="left: {{divide stats.cp 1.5}}%; width: {{divide (abs stats.cpChange) 1.5}}%;"></div>
+                    {{/if}}
+                  {{else}}
+                    <div class="nw-fill nw-fill-cp" style="width: {{divide stats.cp 1.5}}%;"></div>
+                  {{/if}}
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </details>
+    {{else}}
+      <div class="nw-panel nw-field nw-empty">No NPC characters are currently tracked.</div>
+    {{/each}}
+  </div>
+</section>
+<!-- CARD_TEMPLATE_END -->
+
+<!--
+TEMPLATE VARIABLES:
+- {{worldData.*}}: Structured world and plot momentum state.
+- {{characters}}: Up to four normalized NPC character records.
+- {{characterName}}: NPC name.
+- {{bgColor}} / {{darkerBgColor}}: Character color and darker variant.
+- {{stats.*}}: Character fields, statuses, and relationship values.
+- {{stats.apChange}} / {{stats.dpChange}} / {{stats.tpChange}} / {{stats.cpChange}}: Renderer-derived changes from the previous tracker turn.
+-->
+`,
+  sysPrompt: `## NARRATIVE WEAVE SIMTRACKER
+
+Maintain NPC relationships and separate world/story state. Carry previous values forward unless narrative events justify changes.
+
+## Output Contract
+
+1. Write the narrative first, then exactly one final \`<tracker type="sim">...</tracker>\` block.
+2. Put valid JSON inside using \`{ "worldData": { ... }, "characters": [ ... ] }\`.
+3. Emit the complete schema every turn. Never omit fields, reset unknowns, add another tracker, or output separate Plot Momentum prose.
+4. Preserve values when uncertain. Delete invalid player entries instead.
+
+## NPC Scope and Fields
+
+- \`characters\` contains independently controlled NPCs only, maximum 4. {{user}} is the human-controlled player character, never an NPC.
+- Never track {{user}}, the resolved user display name, active player persona, or any alias of that identity. Do not create a card, mood, attire, thoughts, inactivity, reaction, or relationship stats for the player.
+- Remove any player entry inherited from an earlier tracker. Never rename or replace it. If no NPC qualifies, emit \`"characters": []\`.
+- Every NPC must include: \`name\`, \`mood\`, \`inactive\`, \`inactive_reason\`, \`internal_thought\`, \`attire\`, \`bg\`, \`reaction\`, \`ap\`, \`ap_status\`, \`dp\`, \`dp_status\`, \`tp\`, and \`cp\`.
+- \`name\`: NPC name only.
+- \`mood\`: current mood in the NPC's own words, answering "What is your mood?"
+- \`internal_thought\`: current thoughts/feelings, no asterisks, maximum 3 sentences.
+- \`attire\`: exhaustive list of all worn outerwear, top, bottom, underwear, accessories, and footwear. Give every exact item, color, and material. This list is complete and authoritative; anything absent is not worn. Preserve it unless clothing changes in the narrative.
+- \`inactive\`: true only when unavailable. \`inactive_reason\`: 0=Not inactive, 1=Asleep, 2=Comatose, 3=Contempt/anger, 4=Incapacitated, 5=Death. Use 0 when active.
+- \`bg\`: stable six-digit hex color. If the NPC already has a per-character font/text hex color assigned in context, use that exact hex value for \`bg\`; do not choose a different color. Otherwise choose a stable color based on appearance, personality, theme, or narrative energy.
+
+Before output, verify every \`characters\` object is an independently controlled NPC. Player exclusion overrides history, scene presence, point of view, and state preservation.
+
+## Turn Reaction
+
+\`reaction\` is this turn's aggregate meter temperature. Recalculate it from changes against the immediately previous tracker:
+
+- AP/DP/TP increase = beneficial; decrease = detrimental.
+- CP is inverse: decrease = beneficial; increase = detrimental.
+- Consider both number of changed meters and magnitude/narrative significance.
+- \`1\` = mostly beneficial; \`2\` = mostly detrimental; \`0\` = unchanged, balanced, neutral, or unclear.
+- Never carry reaction forward by default. Friendly dialogue or mood without an actual meter change still gives \`reaction: 0\`.
+
+## Relationship Meters
+
+Clamp every value to its range after updating. Standard events use standard movement; reserve large swings for rare major events.
+
+### AP - Affection toward {{user}}
+
+- Range 0-200. Moves VERY slowly; normal per-turn movement is -5 to +2.
+- Recalculate \`ap_status\` from \`ap\` every turn using only these exact strings:
+  - 0-30: \`Strangers\`
+  - 31-60: \`Acquaintances\`
+  - 61-90: \`Good Friends\`
+  - 91-120: \`Romantic Interest\`
+  - 121-150: \`Going Steady\`
+  - 151-180: \`Committed Relationship\`
+  - 181-200: \`Devoted Partner\`
+
+### DP - Sexual attraction
+
+- Range 0-150. Move in 5-point increments; absolute per-turn limit -50 to +50. A 25-point change is standard for a strong relevant event.
+- Recalculate \`dp_status\` from \`dp\` every turn using only these exact strings:
+  - 0-25: \`Not feeling the heat\`
+  - 26-50: \`A smoldering flame builds\`
+  - 51-75: \`Starting to feel warm\`
+  - 76-100: \`Body's burning up!\`
+  - 101-125: \`A desperate need presents\`
+  - 126-150: \`Pliable in the lustful hunger\`
+
+### TP - Trust in {{user}}
+
+- Range 0-150. Normal movement -5 to +2; absolute limit -50 to +50.
+- Higher trust supports openness, belief, fault admission, and reliance. Lies, manipulation, cheating, betrayal, and broken promises reduce it.
+
+### CP - Contempt toward {{user}}
+
+- Range 0-150. Normal movement -5 to +2; absolute limit -50 to +50.
+- Harm, humiliation, betrayal, and moral disgust raise CP. Good faith, apology, regret, repair, and restitution may lower it. A justified rise may reduce other meters.
+
+## World State
+
+Always include every \`worldData\` field:
+
+- \`part_of_day\`: exactly \`🌅 Morning\`, \`🌞 Day\`, \`🌇 Evening\`, or \`🌙 Night\`, inferred from context and time.
+- \`current_date\`: YYYY-MM-DD with correct calendar rollovers. \`current_time\`: 24-hour HH:MM. Advance either only when narrative time passes.
+- \`day_counter\`: starts at 1 and advances with in-world days. \`days_since_first_meeting\`: starts at 0 unless established otherwise and advances with dates.
+- \`immediate_narrative_thread\`: urgent active next scene step.
+- \`looming_story_beats\`: array of 1-3 concise mid-term consequences or pressures.
+- \`current_narrative_arc\`: primary story focus. \`completed_weave\`: most recent resolved beat.
+- \`parallel_actions\`: brief off-scene event in the exact same time window as the reply. It may seed future characters, factions, or consequences but cannot slow or hijack the main scene. Use \`""\` during intimate, sexual, or highly emotional scenes.
+
+## Structured Plot Momentum
+
+Always maintain \`worldData.plot_momentum\`:
+
+- \`npc_agenda\`: immediate NPC goals independent of {{user}}.
+- \`physics\`: exact positions and location of NPCs and {{user}}.
+- \`scene_pacing\`: exactly \`Slow Burn\`, \`Steady\`, or \`High Momentum\`.
+- \`next_path_options\`: include all four keys:
+  - \`path_a_default\`: obvious next NPC step.
+  - \`path_b_conflict\`: NPC-created friction, resistance, or disagreement.
+  - \`path_c_action\`: physical movement, escalation, or NPC/environment shift.
+  - \`path_d_twist\`: unexpected revelation, interruption, or NPC/environment change.
+- \`selected_path\`: \`A\`, \`B\`, \`C\`, \`D\`, or a blend such as \`A+C\`.
+- \`strategy_reason\`: brief reason the choice serves NPC goals and maintains or intentionally changes pacing.
+
+Check the previous selected path and options before writing new ones. Execute the selected path if still valid; abandon the prior four only if all are invalid. During sexual or explicit scenes, preserve continuity and do not interrupt.
+
+Path options may contain only NPC actions and environmental changes. Never require, predict, branch from, or describe {{user}}'s future feelings, choices, dialogue, reactions, or actions. NPCs must push their own goals.
+
+Avoid pure \`A\` every turn. If prior \`selected_path\` was \`A\`, raise B/C/D priority for this turn and choose one or blend with A unless continuity makes A unavoidable.
+
+## Inline Text Messages
+
+When narrating SMS/chat, use one single-line inline display: \`[[DISPLAY=text_messages, DATA={contact:"Name", time:"HH:MM", messages:[{side:"received", text:"..."},{side:"sent", text:"..."}], status:"Delivered"}]]\`. Include 3-6 prior bubbles when thread history exists.
+
+## Required Shape and Final Check
+
+{{sim_format}}
+
+The tracker must be the final content. Validate JSON, complete fields, types, caps, exact AP/DP statuses, attire completeness, realistic time, no more than four NPCs, and a freshly calculated reaction. Finally remove any player identity or alias from \`characters\`.
+`,
+  customFields: [
+    {
+      key: "name",
+      description: "[string] NPC name only. Never use {{user}}, the resolved user display name, the active player persona name, or any alias of the human-controlled player character."
+    },
+    {
+      key: "mood",
+      description: `[string] NPC's current mood in their own words, answering "What is your mood?"`
+    },
+    {
+      key: "inactive",
+      description: "[boolean] True only when the NPC is unavailable or inactive in the current scene; false otherwise."
+    },
+    {
+      key: "inactive_reason",
+      description: "[number] Inactivity enum: 0=Not inactive, 1=Asleep, 2=Comatose, 3=Contempt/anger, 4=Incapacitated, 5=Death."
+    },
+    {
+      key: "internal_thought",
+      description: "[string] NPC's current thoughts and feelings, maximum 3 sentences, never wrapped in asterisks."
+    },
+    {
+      key: "attire",
+      description: "[string] Exhaustive authoritative list of every worn outerwear, top, bottom, underwear, accessory, and footwear item, including each exact item, color, and material. Anything absent is not worn; preserve unchanged until a narrative event changes the NPC's clothing."
+    },
+    {
+      key: "bg",
+      description: "[string] Stable six-digit hex color. If the NPC already has an assigned per-character font/text hex color, use that exact value; otherwise choose one from appearance, personality, theme, or narrative energy."
+    },
+    {
+      key: "reaction",
+      description: "[number] Recalculate every turn as the aggregate temperature of that turn's meter changes: 1=Mostly beneficial (AP/DP/TP gains and CP reductions dominate), 2=Mostly detrimental (AP/DP/TP losses and CP increases dominate), 0=No changes, balanced changes, or neutral/unclear. Never carry the previous reaction forward by default."
+    },
+    {
+      key: "ap",
+      description: "[number] Affection Points toward the user, 0-200 hard range; normal per-turn movement -5 to +2."
+    },
+    {
+      key: "ap_status",
+      description: "[string] Exact status recalculated from AP: Strangers, Acquaintances, Good Friends, Romantic Interest, Going Steady, Committed Relationship, or Devoted Partner."
+    },
+    {
+      key: "dp",
+      description: "[number] Desire Points, 0-150 hard range; move in 5-point increments with absolute per-turn change -50 to +50."
+    },
+    {
+      key: "dp_status",
+      description: "[string] Exact status recalculated from DP: Not feeling the heat, A smoldering flame builds, Starting to feel warm, Body's burning up!, A desperate need presents, or Pliable in the lustful hunger."
+    },
+    {
+      key: "tp",
+      description: "[number] Trust Points toward the user, 0-150 hard range; normal per-turn movement -5 to +2 and absolute limit -50 to +50."
+    },
+    {
+      key: "cp",
+      description: "[number] Contempt Points toward the user, 0-150 hard range; normal per-turn movement -5 to +2 and absolute limit -50 to +50."
+    },
+    {
+      key: "worldData.part_of_day",
+      description: "[string] Exact time-of-day label inferred from context and current_time: 🌅 Morning, 🌞 Day, 🌇 Evening, or 🌙 Night."
+    },
+    {
+      key: "worldData.current_date",
+      description: "[string] Current in-world date in YYYY-MM-DD format, advanced only with narrative time and with correct calendar rollovers."
+    },
+    {
+      key: "worldData.current_time",
+      description: "[string] Current in-world time in 24-hour HH:MM format, advanced realistically only when narrative time passes."
+    },
+    {
+      key: "worldData.day_counter",
+      description: "[number] Display day counter starting at 1 and advancing with in-world date changes."
+    },
+    {
+      key: "worldData.days_since_first_meeting",
+      description: "[number] Number of in-world days since the first meeting, starting at 0 unless established otherwise."
+    },
+    {
+      key: "worldData.immediate_narrative_thread",
+      description: "[string] Urgent active next step in the current scene."
+    },
+    {
+      key: "worldData.looming_story_beats",
+      description: "[array] One to three concise mid-term consequences or upcoming story pressures."
+    },
+    {
+      key: "worldData.current_narrative_arc",
+      description: "[string] Current primary focus of the story."
+    },
+    {
+      key: "worldData.completed_weave",
+      description: "[string] Most recent resolved narrative beat."
+    },
+    {
+      key: "worldData.parallel_actions",
+      description: "[string] Brief simultaneous off-scene event in the exact current reply window; empty during intimate, sexual, or highly emotional scenes."
+    },
+    {
+      key: "worldData.plot_momentum",
+      description: "Structured plot momentum object. Preserve the complete object and all required child fields every turn; never replace it with a prose block."
+    },
+    {
+      key: "worldData.plot_momentum.npc_agenda",
+      description: "[string] Immediate goals of NPCs independent of the user."
+    },
+    {
+      key: "worldData.plot_momentum.physics",
+      description: "[string] Exact current location and positioning of NPCs and the user."
+    },
+    {
+      key: "worldData.plot_momentum.scene_pacing",
+      description: "[string] Exact pacing enum: Slow Burn, Steady, or High Momentum."
+    },
+    {
+      key: "worldData.plot_momentum.next_path_options.path_a_default",
+      description: "[string] Most obvious next NPC action; never predicts or requires a future user action."
+    },
+    {
+      key: "worldData.plot_momentum.next_path_options.path_b_conflict",
+      description: "[string] NPC-created friction, resistance, or disagreement; never predicts or requires a future user action."
+    },
+    {
+      key: "worldData.plot_momentum.next_path_options.path_c_action",
+      description: "[string] Physical movement, escalation, or NPC/environment shift; never predicts or requires a future user action."
+    },
+    {
+      key: "worldData.plot_momentum.next_path_options.path_d_twist",
+      description: "[string] Unexpected revelation, interruption, or NPC/environment change; never predicts or requires a future user action."
+    },
+    {
+      key: "worldData.plot_momentum.selected_path",
+      description: "[string] Selected path A, B, C, D, or a blend such as A+C; execute the previous selection while it remains valid."
+    },
+    {
+      key: "worldData.plot_momentum.strategy_reason",
+      description: "[string] Brief reason the selected path serves NPC goals and follows scene pacing."
+    }
+  ],
+  extSettings: {
+    codeBlockIdentifier: "sim",
+    defaultBgColor: "#5b4b8a",
+    showThoughtBubble: true,
+    hideSimBlocks: true,
+    templateFile: "narrative-weave-simtracker.html",
+    renderMode: "tracker",
+    maxCharacters: 4,
+    presetRevision: 2
+  }
+};
 
 // src/templatePresets.ts
 var PRESETS = [
@@ -10533,6 +11832,10 @@ var PRESETS = [
   {
     id: "pulse-thread-tracker",
     ...pulse_thread_tracker_default
+  },
+  {
+    id: "narrative-weave-simtracker",
+    ...narrative_weave_simtracker_default
   }
 ];
 function getTemplatePresets() {
@@ -16687,8 +17990,9 @@ function renderErrorSpan(name, reason, detail) {
 function collectInlineDefs(config, preset) {
   const out = [];
   const presetInline = preset.inlineTemplates;
-  if (Array.isArray(presetInline))
+  if (preset.inlineTemplatesEnabled === true && Array.isArray(presetInline)) {
     out.push(...presetInline);
+  }
   for (const pack of config.inlinePacks) {
     if (pack && pack.enabled === false)
       continue;
@@ -16822,19 +18126,22 @@ function createInlineTemplateProcessor(deps) {
     if (!messageId)
       return;
     const config = deps.getConfig();
+    const preset = deps.getPreset();
+    const presetInline = preset.inlineTemplates;
+    const hasPresetInline = preset.inlineTemplatesEnabled === true && Array.isArray(presetInline) && presetInline.length > 0;
     clearMessage(messageId);
-    if (!config.enableInlineTemplates)
+    if (!config.enableInlineTemplates && !hasPresetInline)
       return;
+    const effectiveConfig = config.enableInlineTemplates ? config : { ...config, inlinePacks: [] };
     const messageNode = document.querySelector(`[data-message-id="${messageId}"]`);
     if (!messageNode)
       return;
     const proseNodes = Array.from(messageNode.querySelectorAll("div[class*='prose']"));
     const roots = proseNodes.length > 0 ? proseNodes : [messageNode];
-    const preset = deps.getPreset();
     const messageArtifacts = [];
     for (const root of roots) {
-      processTagElements(root, config, preset, messageArtifacts);
-      processLegacyMarkers(root, config, preset, messageArtifacts);
+      processTagElements(root, effectiveConfig, preset, messageArtifacts);
+      processLegacyMarkers(root, effectiveConfig, preset, messageArtifacts);
     }
     if (messageArtifacts.length > 0) {
       artifactsByMessage.set(messageId, messageArtifacts);
@@ -17009,13 +18316,14 @@ async function shouldBroadcastReadyForHost() {
   }
 }
 function createReadyGate(ctx) {
-  if (typeof ctx.deferReady !== "function" || typeof ctx.ready !== "function") {
+  const readyContext = ctx;
+  if (typeof readyContext.deferReady !== "function" || typeof readyContext.ready !== "function") {
     return {
       dispose() {},
       release() {}
     };
   }
-  ctx.deferReady();
+  readyContext.deferReady();
   const shouldBroadcastReady = shouldBroadcastReadyForHost();
   let disposed = false;
   let released = false;
@@ -17029,7 +18337,7 @@ function createReadyGate(ctx) {
       released = true;
       shouldBroadcastReady.then((allowed) => {
         if (!disposed && allowed) {
-          ctx.ready();
+          readyContext.ready?.();
         }
       });
     }
@@ -17664,6 +18972,15 @@ function darkenColor(hex, amount = 20) {
   const b = Math.max(0, parseInt(clean.slice(4, 6), 16) - amount);
   return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
 }
+function normalizeHexColor(value, fallback = "#6a5acd") {
+  const clean = typeof value === "string" ? value.trim().replace(/^#/, "") : "";
+  if (/^[0-9a-f]{6}$/i.test(clean))
+    return `#${clean}`;
+  if (/^[0-9a-f]{3}$/i.test(clean)) {
+    return `#${clean.split("").map((digit) => `${digit}${digit}`).join("")}`;
+  }
+  return fallback;
+}
 function adjustColorBrightness(hex, brightnessPercent) {
   const clean = (hex || "#000000").replace("#", "");
   const factor = Math.max(0, Math.min(100, brightnessPercent)) / 100;
@@ -17928,15 +19245,15 @@ function extractCardTemplate(htmlTemplate) {
   return raw.trim();
 }
 function compileTemplate(preset) {
-  const key = preset.id;
-  if (TEMPLATE_CACHE.has(key))
-    return TEMPLATE_CACHE.get(key) || null;
   const html = extractCardTemplate(preset.htmlTemplate);
   if (!html)
     return null;
+  const cached = TEMPLATE_CACHE.get(preset.id);
+  if (cached?.source === html)
+    return cached.compiled;
   try {
     const compiled = import_handlebars2.default.compile(html);
-    TEMPLATE_CACHE.set(key, compiled);
+    TEMPLATE_CACHE.set(preset.id, { source: html, compiled });
     return compiled;
   } catch {
     return null;
@@ -17944,15 +19261,18 @@ function compileTemplate(preset) {
 }
 function buildTemplateData(data, preset, previousData) {
   const worldData = data.worldData || {};
-  const characters = normalizeCharacters(data);
+  const configuredMaxCharacters = Number(preset.extSettings?.maxCharacters);
+  const maxCharacters = Number.isFinite(configuredMaxCharacters) && configuredMaxCharacters > 0 ? Math.floor(configuredMaxCharacters) : Number.POSITIVE_INFINITY;
+  const characters = normalizeCharacters(data).slice(0, maxCharacters);
   const currentDate = typeof worldData.current_date === "string" ? worldData.current_date : "Unknown Date";
   const currentTime = typeof worldData.current_time === "string" ? worldData.current_time : "Unknown Time";
   const tabbed = (preset.htmlTemplate || "").includes("sim-tracker-tabs") || preset.id.includes("tabs");
+  const trackerLevel = preset.extSettings?.renderMode === "tracker";
   const statChanges = calculateStatChanges(characters, previousData);
   const characterPayload = characters.map((character) => {
     const stats = character;
     const name = typeof stats.name === "string" ? stats.name : "Character";
-    const bgColor = typeof stats.bg === "string" ? stats.bg : "#6a5acd";
+    const bgColor = normalizeHexColor(stats.bg);
     const isNestedStats = stats && typeof stats === "object" && typeof stats.stats === "object" && stats.stats !== null;
     const templateStats = isNestedStats ? { ...stats, ...stats.stats } : { ...stats };
     if (isNestedStats) {
@@ -17985,11 +19305,12 @@ function buildTemplateData(data, preset, previousData) {
       showThoughtBubble: true
     };
   });
-  if (tabbed) {
+  if (tabbed || trackerLevel) {
     return {
-      tabbed: true,
+      renderMode: trackerLevel ? "tracker" : "tabbed",
       input: {
         characters: characterPayload,
+        worldData,
         currentDate,
         currentTime
       },
@@ -17997,9 +19318,10 @@ function buildTemplateData(data, preset, previousData) {
     };
   }
   return {
-    tabbed: false,
+    renderMode: "single",
     input: {
       characters: characterPayload,
+      worldData,
       currentDate,
       currentTime
     },
@@ -18036,8 +19358,8 @@ function buildTrackerMarkup(data, preset, previousData) {
   const prep = buildTemplateData(data, preset, previousData);
   try {
     let cardsHtml = "";
-    if (prep.tabbed) {
-      const transformed = executeTemplateLogic(prep.input, "tabbed", preset);
+    if (prep.renderMode !== "single") {
+      const transformed = executeTemplateLogic(prep.input, prep.renderMode, preset);
       cardsHtml = compiled(transformed);
     } else {
       const inputChars = prep.input.characters || [];
@@ -18139,6 +19461,7 @@ function setup(ctx) {
   const trackerMessageIds = new Set;
   const trackerMessageMounts = new Map;
   const trackerMessageRenders = new Map;
+  const trackerComparisonBaselines = new Map;
   const trackerGeneratingIndicators = new Map;
   let latestMessageRenderIntent = null;
   let pendingGeneratingIndicatorMessageId = null;
@@ -18553,6 +19876,10 @@ function setup(ctx) {
       return false;
     if (a.preset.id !== preset.id || a.mode !== mode)
       return false;
+    if (a.preset.htmlTemplate !== preset.htmlTemplate)
+      return false;
+    if (JSON.stringify(a.preset.extSettings) !== JSON.stringify(preset.extSettings))
+      return false;
     if (JSON.stringify(a.data) !== JSON.stringify(data))
       return false;
     if (JSON.stringify(a.previousData) !== JSON.stringify(previousData))
@@ -18596,7 +19923,13 @@ function setup(ctx) {
       pendingTrackerPayload = { raw, sourceContent, messageId };
       return;
     }
+    let comparisonData = previousTrackerData;
     if (messageId) {
+      if (!trackerComparisonBaselines.has(messageId)) {
+        trackerComparisonBaselines.clear();
+        trackerComparisonBaselines.set(messageId, previousTrackerData);
+      }
+      comparisonData = trackerComparisonBaselines.get(messageId) || null;
       trackerMessageIds.add(messageId);
       latestTrackerMessageId = messageId;
       updateRegenerateButton();
@@ -18617,12 +19950,12 @@ function setup(ctx) {
     latestTrackerRaw = raw;
     latestTrackerSourceContent = sourceContent;
     setStatus(`Tracker updated (${preset.templateName})`);
-    renderTracker(parsed, raw, preset, previousTrackerData, (html) => {
+    renderTracker(parsed, raw, preset, comparisonData, (html) => {
       injectIntoPanelBody(html);
     });
     if (mountMode === "side_left" || mountMode === "side_right") {
       clearLatestMessageRenderIntent();
-      renderTrackerInSidebar(parsed, preset, previousTrackerData, mountMode);
+      renderTrackerInSidebar(parsed, preset, comparisonData, mountMode);
       if (messageId)
         clearMessageTrackerRender(messageId);
     } else if (messageId) {
@@ -18630,11 +19963,11 @@ function setup(ctx) {
         messageId,
         data: parsed,
         preset,
-        previousData: previousTrackerData,
+        previousData: comparisonData,
         mode: mountMode
       };
       clearSideTrackerRender();
-      renderTrackerIntoMessage(messageId, parsed, preset, previousTrackerData, mountMode);
+      renderTrackerIntoMessage(messageId, parsed, preset, comparisonData, mountMode);
       pruneNonLatestMessageTrackers();
     }
     previousTrackerData = parsed;
@@ -18656,6 +19989,7 @@ function setup(ctx) {
       }
       if (wasLatest) {
         previousTrackerData = null;
+        trackerComparisonBaselines.clear();
         setStatus("No tracker tag in active swipe/edit");
         renderEmpty("No tracker tag found in this message version.");
       }
@@ -18747,6 +20081,11 @@ function setup(ctx) {
         const msgId = typeof entry.messageId === "string" ? entry.messageId : null;
         if (msgId && trackerMessageIds.has(msgId))
           return;
+        if (msgId) {
+          const previous = typeof entry.previousPayload === "string" ? parseTrackerBlock(entry.previousPayload) : null;
+          trackerComparisonBaselines.clear();
+          trackerComparisonBaselines.set(msgId, previous);
+        }
         handleTrackerPayload(entry.payload, entry.payload, msgId);
       }
       return;
@@ -18868,6 +20207,7 @@ function setup(ctx) {
     if (context.messageId)
       inlineProcessor.clearMessage(context.messageId);
     previousTrackerData = null;
+    trackerComparisonBaselines.clear();
     latestTrackerRaw = null;
     latestTrackerSourceContent = null;
     latestContent = null;
@@ -18901,11 +20241,13 @@ function setup(ctx) {
       clearLatestMessageRenderIntent(context.messageId);
       clearMessageTrackerRender(context.messageId);
     }
+    trackerComparisonBaselines.delete(context.messageId);
     hideGeneratingIndicator(context.messageId);
     inlineProcessor.clearMessage(context.messageId);
     if (latestTrackerMessageId === context.messageId) {
       latestTrackerMessageId = null;
       previousTrackerData = null;
+      trackerComparisonBaselines.clear();
       latestTrackerRaw = null;
       latestTrackerSourceContent = null;
       latestContent = null;
@@ -18915,6 +20257,7 @@ function setup(ctx) {
   };
   const resetChatState = () => {
     previousTrackerData = null;
+    trackerComparisonBaselines.clear();
     latestTrackerMessageId = null;
     latestTrackerRaw = null;
     latestTrackerSourceContent = null;

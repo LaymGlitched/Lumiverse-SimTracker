@@ -3,6 +3,7 @@ import datingCardTemplate from "../tracker-card-templates/dating-card-template.j
 import tacticalHudSidebarTabs from "../tracker-card-templates/tactical-hud-sidebar-tabs.json";
 import rpgSidebarPreset from "../tracker-card-templates/rpg-sidebar-preset.json";
 import pulseThreadTracker from "../tracker-card-templates/pulse-thread-tracker.json";
+import narrativeWeaveSimTracker from "../custom/narrative-weave-simtracker.json";
 
 export type TemplateField = {
   key: string;
@@ -22,6 +23,10 @@ export type TemplatePreset = {
   customFields?: TemplateField[];
   extSettings?: {
     codeBlockIdentifier?: string;
+    /** Compile once with `worldData` and the normalized `characters` array. */
+    renderMode?: string;
+    /** Optional display cap applied after character normalization. */
+    maxCharacters?: number;
     [key: string]: unknown;
   };
 };
@@ -46,6 +51,10 @@ const PRESETS: TemplatePreset[] = [
   {
     id: "pulse-thread-tracker",
     ...pulseThreadTracker,
+  },
+  {
+    id: "narrative-weave-simtracker",
+    ...narrativeWeaveSimTracker,
   },
 ];
 
