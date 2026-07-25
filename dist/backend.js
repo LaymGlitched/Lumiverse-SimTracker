@@ -11251,6 +11251,15 @@ function stringify3(value, replacer, options) {
   return new Document(value, _replacer, options).toString(options);
 }
 // src/backend.ts
+var FERTILITY_CYCLE_BIAS_VALUES = [
+  "random",
+  "menstruating",
+  "start_follicular",
+  "close_ovulation",
+  "ovulating",
+  "start_luteal",
+  "end_luteal"
+];
 var DEFAULT_CONFIG = {
   trackerTagName: "tracker",
   codeBlockIdentifier: "sim",
@@ -11266,7 +11275,8 @@ var DEFAULT_CONFIG = {
   secondaryLLMModel: "",
   secondaryLLMMessageCount: 5,
   secondaryLLMTemperature: 0.7,
-  secondaryLLMStripHTML: true
+  secondaryLLMStripHTML: true,
+  fertilityCycleBias: "random"
 };
 var CONFIG_PATH = "preferences.json";
 var config = { ...DEFAULT_CONFIG };
@@ -11509,6 +11519,9 @@ function sanitizeBool(value, fallback) {
 }
 function sanitizeStr(value, fallback) {
   return typeof value === "string" ? value.trim() : fallback;
+}
+function sanitizeFertilityCycleBias(value) {
+  return typeof value === "string" && FERTILITY_CYCLE_BIAS_VALUES.includes(value) ? value : DEFAULT_CONFIG.fertilityCycleBias;
 }
 function sanitizeSecondaryLLMModel(value, fallback) {
   const raw = sanitizeStr(value, fallback);
@@ -12191,7 +12204,8 @@ async function loadConfig(userId) {
       secondaryLLMModel: sanitizeSecondaryLLMModel(parsed.secondaryLLMModel, DEFAULT_CONFIG.secondaryLLMModel),
       secondaryLLMMessageCount: sanitizeMessageCount(parsed.secondaryLLMMessageCount),
       secondaryLLMTemperature: sanitizeTemperature(parsed.secondaryLLMTemperature),
-      secondaryLLMStripHTML: sanitizeBool(parsed.secondaryLLMStripHTML, DEFAULT_CONFIG.secondaryLLMStripHTML)
+      secondaryLLMStripHTML: sanitizeBool(parsed.secondaryLLMStripHTML, DEFAULT_CONFIG.secondaryLLMStripHTML),
+      fertilityCycleBias: sanitizeFertilityCycleBias(parsed.fertilityCycleBias)
     };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
@@ -12665,6 +12679,47 @@ ${describeRejectedModelGuidance(trimmedModel)}` : rawMessage;
     await trackEvent("sst.secondary_generation.failed", { error: rawMessage }, { level: "error" });
   }
 }
+function pickInitialCycleState(bias) {
+  const roll = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
+  switch (bias) {
+    case "menstruating": {
+      const day = roll(1, 5);
+      return { day, description: `menstruating (cycle_stage_id 1)` };
+    }
+    case "start_follicular": {
+      const day = roll(6, 10);
+      return { day, description: `in the early follicular phase (cycle_stage_id 2)` };
+    }
+    case "close_ovulation": {
+      const day = roll(11, 13);
+      return { day, description: `late in the follicular phase, approaching ovulation (cycle_stage_id 2)` };
+    }
+    case "ovulating": {
+      const day = roll(14, 16);
+      return { day, description: `ovulating (cycle_stage_id 3)` };
+    }
+    case "start_luteal": {
+      const day = roll(17, 21);
+      return { day, description: `in the early luteal phase (cycle_stage_id 4)` };
+    }
+    case "end_luteal": {
+      const day = roll(24, 28);
+      return { day, description: `late in the luteal phase, pre-menstrual (cycle_stage_id 4)` };
+    }
+    case "random":
+    default: {
+      const day = roll(1, 28);
+      return { day, description: "" };
+    }
+  }
+}
+function buildFirstMessageHint(bias) {
+  const { day, description } = pickInitialCycleState(bias);
+  const qualifier = description ? `, ${description}` : "";
+  return `
+
+INITIAL STATE: Female and Futanari characters begin on day ${day} of their fertility cycle already${qualifier}. Reflect this in the first tracker.`;
+}
 spindle.on("GENERATION_STARTED", (payload, userId) => {
   (async () => {
     await ensureConfigForUser(userId);
@@ -12684,10 +12739,7 @@ spindle.on("GENERATION_STARTED", (payload, userId) => {
         return msgs.filter((m) => m.role === "user").length === 1;
       })();
       if (isNewChat) {
-        const cycleDay = 1 + Math.floor(Math.random() * 28);
-        firstMessageHint = `
-
-INITIAL STATE: Female and Futanari characters begin on day ${cycleDay} of their fertility cycle already. Reflect this in the first tracker.`;
+        firstMessageHint = buildFirstMessageHint(config.fertilityCycleBias);
       }
     } catch {}
     if (previousHint !== firstMessageHint)
@@ -13189,7 +13241,8 @@ spindle.onFrontendMessage(async (payload, userId) => {
         secondaryLLMModel: sanitizeSecondaryLLMModel(incoming?.secondaryLLMModel ?? config.secondaryLLMModel, config.secondaryLLMModel),
         secondaryLLMMessageCount: sanitizeMessageCount(incoming?.secondaryLLMMessageCount ?? config.secondaryLLMMessageCount),
         secondaryLLMTemperature: sanitizeTemperature(incoming?.secondaryLLMTemperature ?? config.secondaryLLMTemperature),
-        secondaryLLMStripHTML: sanitizeBool(incoming?.secondaryLLMStripHTML ?? config.secondaryLLMStripHTML, config.secondaryLLMStripHTML)
+        secondaryLLMStripHTML: sanitizeBool(incoming?.secondaryLLMStripHTML ?? config.secondaryLLMStripHTML, config.secondaryLLMStripHTML),
+        fertilityCycleBias: sanitizeFertilityCycleBias(incoming?.fertilityCycleBias ?? config.fertilityCycleBias)
       };
       await saveConfig(userId);
       pushMacroValues();

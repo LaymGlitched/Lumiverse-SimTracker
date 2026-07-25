@@ -16945,6 +16945,15 @@ function createInlineTemplateProcessor(deps) {
 }
 
 // src/frontend.ts
+var FERTILITY_CYCLE_BIAS_VALUES = [
+  "random",
+  "menstruating",
+  "start_follicular",
+  "close_ovulation",
+  "ovulating",
+  "start_luteal",
+  "end_luteal"
+];
 var DEFAULT_CONFIG = {
   trackerTagName: "tracker",
   codeBlockIdentifier: "sim",
@@ -16960,7 +16969,8 @@ var DEFAULT_CONFIG = {
   secondaryLLMModel: "",
   secondaryLLMMessageCount: 5,
   secondaryLLMTemperature: 0.7,
-  secondaryLLMStripHTML: true
+  secondaryLLMStripHTML: true,
+  fertilityCycleBias: "random"
 };
 var BUILTIN_PRESETS = getTemplatePresets();
 var runtimeSeededPresets = [];
@@ -17407,6 +17417,17 @@ var PANEL_HTML = `
       <label>Retain tracker tags in prompt<input id="sst-lumi-retain" type="number" min="0" max="20" value="3" /></label>
       <label class="sst-lumi-checkbox"><input id="sst-lumi-inline" type="checkbox" />Enable inline displays</label>
       <label class="sst-lumi-checkbox"><input id="sst-lumi-hide" type="checkbox" checked />Hide tracker tags in chat</label>
+      <label>New-chat fertility cycle start
+        <select id="sst-lumi-cycle-bias">
+          <option value="random">Random</option>
+          <option value="menstruating">Menstruating</option>
+          <option value="start_follicular">Start of Follicular</option>
+          <option value="close_ovulation">Close to Ovulation</option>
+          <option value="ovulating">Ovulating</option>
+          <option value="start_luteal">Start of Luteal</option>
+          <option value="end_luteal">End of Luteal</option>
+        </select>
+      </label>
       <div class="sst-lumi-actions">
         <button id="sst-lumi-save" type="button">Save Settings</button>
         <button id="sst-lumi-export" type="button">Export Preset</button>
@@ -18279,6 +18300,9 @@ function setup(ctx) {
       formatSelect.value = config.trackerFormat;
     if (retainInput)
       retainInput.value = String(config.retainTrackerCount);
+    const cycleBiasSelect = byId("sst-lumi-cycle-bias");
+    if (cycleBiasSelect)
+      cycleBiasSelect.value = config.fertilityCycleBias;
     const llmEnable = byId("sst-lumi-llm-enable");
     const llmMsgCount = byId("sst-lumi-llm-msgcount");
     const llmTemp = byId("sst-lumi-llm-temp");
@@ -18756,7 +18780,8 @@ function setup(ctx) {
       secondaryLLMModel: typeof incoming.secondaryLLMModel === "string" ? incoming.secondaryLLMModel : DEFAULT_CONFIG.secondaryLLMModel,
       secondaryLLMMessageCount: typeof incoming.secondaryLLMMessageCount === "number" ? incoming.secondaryLLMMessageCount : DEFAULT_CONFIG.secondaryLLMMessageCount,
       secondaryLLMTemperature: typeof incoming.secondaryLLMTemperature === "number" ? incoming.secondaryLLMTemperature : DEFAULT_CONFIG.secondaryLLMTemperature,
-      secondaryLLMStripHTML: typeof incoming.secondaryLLMStripHTML === "boolean" ? incoming.secondaryLLMStripHTML : DEFAULT_CONFIG.secondaryLLMStripHTML
+      secondaryLLMStripHTML: typeof incoming.secondaryLLMStripHTML === "boolean" ? incoming.secondaryLLMStripHTML : DEFAULT_CONFIG.secondaryLLMStripHTML,
+      fertilityCycleBias: typeof incoming.fertilityCycleBias === "string" && FERTILITY_CYCLE_BIAS_VALUES.includes(incoming.fertilityCycleBias) ? incoming.fertilityCycleBias : DEFAULT_CONFIG.fertilityCycleBias
     };
     configReady = true;
     if (configRetryTimer) {
@@ -18957,6 +18982,7 @@ function setup(ctx) {
     const inlineInput = byId("sst-lumi-inline");
     const formatSelect = byId("sst-lumi-format");
     const retainInput = byId("sst-lumi-retain");
+    const cycleBiasSelect = byId("sst-lumi-cycle-bias");
     const selectedTemplate = templateSelectLocal?.value || DEFAULT_CONFIG.templateId;
     const preset = getPresetById(config, selectedTemplate);
     const fallbackId = preset.extSettings?.codeBlockIdentifier;
@@ -18979,7 +19005,8 @@ function setup(ctx) {
       secondaryLLMModel: sanitizeSecondaryLLMModel(modelCombobox?.getValue() ?? ""),
       secondaryLLMMessageCount: Math.max(1, Math.min(50, Math.floor(Number(llmMsgCount?.value) || 5))),
       secondaryLLMTemperature: Math.max(0, Math.min(2, Number(llmTemp?.value) || 0.7)),
-      secondaryLLMStripHTML: Boolean(llmStrip?.checked)
+      secondaryLLMStripHTML: Boolean(llmStrip?.checked),
+      fertilityCycleBias: FERTILITY_CYCLE_BIAS_VALUES.includes(cycleBiasSelect?.value || "") ? cycleBiasSelect.value : DEFAULT_CONFIG.fertilityCycleBias
     };
     persistConfig();
     configTrackerTagNameHint = config.trackerTagName;

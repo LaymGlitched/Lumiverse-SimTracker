@@ -4,6 +4,25 @@ import { getTemplatePresets, mergeTemplatePresets, type TemplatePreset } from ".
 import { parseTrackerBlock, type TrackerData } from "./trackerData";
 import { createInlineTemplateProcessor } from "./inlineTemplates";
 
+type FertilityCycleBias =
+  | "random"
+  | "menstruating"
+  | "start_follicular"
+  | "close_ovulation"
+  | "ovulating"
+  | "start_luteal"
+  | "end_luteal";
+
+const FERTILITY_CYCLE_BIAS_VALUES: readonly FertilityCycleBias[] = [
+  "random",
+  "menstruating",
+  "start_follicular",
+  "close_ovulation",
+  "ovulating",
+  "start_luteal",
+  "end_luteal",
+];
+
 type TrackerConfig = {
   trackerTagName: string;
   codeBlockIdentifier: string;
@@ -20,6 +39,7 @@ type TrackerConfig = {
   secondaryLLMMessageCount: number;
   secondaryLLMTemperature: number;
   secondaryLLMStripHTML: boolean;
+  fertilityCycleBias: FertilityCycleBias;
 };
 
 type ConnectionProfile = {
@@ -50,6 +70,7 @@ const DEFAULT_CONFIG: TrackerConfig = {
   secondaryLLMMessageCount: 5,
   secondaryLLMTemperature: 0.7,
   secondaryLLMStripHTML: true,
+  fertilityCycleBias: "random",
 };
 
 const BUILTIN_PRESETS = getTemplatePresets();
@@ -584,6 +605,17 @@ const PANEL_HTML = `
       <label>Retain tracker tags in prompt<input id="sst-lumi-retain" type="number" min="0" max="20" value="3" /></label>
       <label class="sst-lumi-checkbox"><input id="sst-lumi-inline" type="checkbox" />Enable inline displays</label>
       <label class="sst-lumi-checkbox"><input id="sst-lumi-hide" type="checkbox" checked />Hide tracker tags in chat</label>
+      <label>New-chat fertility cycle start
+        <select id="sst-lumi-cycle-bias">
+          <option value="random">Random</option>
+          <option value="menstruating">Menstruating</option>
+          <option value="start_follicular">Start of Follicular</option>
+          <option value="close_ovulation">Close to Ovulation</option>
+          <option value="ovulating">Ovulating</option>
+          <option value="start_luteal">Start of Luteal</option>
+          <option value="end_luteal">End of Luteal</option>
+        </select>
+      </label>
       <div class="sst-lumi-actions">
         <button id="sst-lumi-save" type="button">Save Settings</button>
         <button id="sst-lumi-export" type="button">Export Preset</button>
@@ -1577,6 +1609,9 @@ export function setup(ctx: SpindleFrontendContext) {
     if (formatSelect) formatSelect.value = config.trackerFormat;
     if (retainInput) retainInput.value = String(config.retainTrackerCount);
 
+    const cycleBiasSelect = byId<HTMLSelectElement>("sst-lumi-cycle-bias");
+    if (cycleBiasSelect) cycleBiasSelect.value = config.fertilityCycleBias;
+
     const llmEnable = byId<HTMLInputElement>("sst-lumi-llm-enable");
     const llmMsgCount = byId<HTMLInputElement>("sst-lumi-llm-msgcount");
     const llmTemp = byId<HTMLInputElement>("sst-lumi-llm-temp");
@@ -2135,6 +2170,10 @@ export function setup(ctx: SpindleFrontendContext) {
       secondaryLLMMessageCount: typeof incoming.secondaryLLMMessageCount === "number" ? incoming.secondaryLLMMessageCount : DEFAULT_CONFIG.secondaryLLMMessageCount,
       secondaryLLMTemperature: typeof incoming.secondaryLLMTemperature === "number" ? incoming.secondaryLLMTemperature : DEFAULT_CONFIG.secondaryLLMTemperature,
       secondaryLLMStripHTML: typeof incoming.secondaryLLMStripHTML === "boolean" ? incoming.secondaryLLMStripHTML : DEFAULT_CONFIG.secondaryLLMStripHTML,
+      fertilityCycleBias:
+        typeof incoming.fertilityCycleBias === "string" && (FERTILITY_CYCLE_BIAS_VALUES as readonly string[]).includes(incoming.fertilityCycleBias)
+          ? (incoming.fertilityCycleBias as FertilityCycleBias)
+          : DEFAULT_CONFIG.fertilityCycleBias,
     };
     configReady = true;
     if (configRetryTimer) {
@@ -2365,6 +2404,7 @@ export function setup(ctx: SpindleFrontendContext) {
     const inlineInput = byId<HTMLInputElement>("sst-lumi-inline");
     const formatSelect = byId<HTMLSelectElement>("sst-lumi-format");
     const retainInput = byId<HTMLInputElement>("sst-lumi-retain");
+    const cycleBiasSelect = byId<HTMLSelectElement>("sst-lumi-cycle-bias");
 
     const selectedTemplate = templateSelectLocal?.value || DEFAULT_CONFIG.templateId;
     const preset = getPresetById(config, selectedTemplate);
@@ -2391,6 +2431,9 @@ export function setup(ctx: SpindleFrontendContext) {
       secondaryLLMMessageCount: Math.max(1, Math.min(50, Math.floor(Number(llmMsgCount?.value) || 5))),
       secondaryLLMTemperature: Math.max(0, Math.min(2, Number(llmTemp?.value) || 0.7)),
       secondaryLLMStripHTML: Boolean(llmStrip?.checked),
+      fertilityCycleBias: (FERTILITY_CYCLE_BIAS_VALUES as readonly string[]).includes(cycleBiasSelect?.value || "")
+        ? (cycleBiasSelect!.value as FertilityCycleBias)
+        : DEFAULT_CONFIG.fertilityCycleBias,
     };
     persistConfig();
     configTrackerTagNameHint = config.trackerTagName;

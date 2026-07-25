@@ -3,6 +3,25 @@ import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 
 declare const spindle: import("lumiverse-spindle-types").SpindleAPI;
 
+type FertilityCycleBias =
+  | "random"
+  | "menstruating"
+  | "start_follicular"
+  | "close_ovulation"
+  | "ovulating"
+  | "start_luteal"
+  | "end_luteal";
+
+const FERTILITY_CYCLE_BIAS_VALUES: readonly FertilityCycleBias[] = [
+  "random",
+  "menstruating",
+  "start_follicular",
+  "close_ovulation",
+  "ovulating",
+  "start_luteal",
+  "end_luteal",
+];
+
 type TrackerConfig = {
   trackerTagName: string;
   codeBlockIdentifier: string;
@@ -19,6 +38,7 @@ type TrackerConfig = {
   secondaryLLMMessageCount: number;
   secondaryLLMTemperature: number;
   secondaryLLMStripHTML: boolean;
+  fertilityCycleBias: FertilityCycleBias;
 };
 
 const DEFAULT_CONFIG: TrackerConfig = {
@@ -37,6 +57,7 @@ const DEFAULT_CONFIG: TrackerConfig = {
   secondaryLLMMessageCount: 5,
   secondaryLLMTemperature: 0.7,
   secondaryLLMStripHTML: true,
+  fertilityCycleBias: "random",
 };
 
 const CONFIG_PATH = "preferences.json";
@@ -365,6 +386,12 @@ function sanitizeBool(value: unknown, fallback: boolean): boolean {
 
 function sanitizeStr(value: unknown, fallback: string): string {
   return typeof value === "string" ? value.trim() : fallback;
+}
+
+function sanitizeFertilityCycleBias(value: unknown): FertilityCycleBias {
+  return typeof value === "string" && (FERTILITY_CYCLE_BIAS_VALUES as readonly string[]).includes(value)
+    ? (value as FertilityCycleBias)
+    : DEFAULT_CONFIG.fertilityCycleBias;
 }
 
 /**
@@ -1324,6 +1351,7 @@ async function loadConfig(userId: string): Promise<void> {
       secondaryLLMMessageCount: sanitizeMessageCount(parsed.secondaryLLMMessageCount),
       secondaryLLMTemperature: sanitizeTemperature(parsed.secondaryLLMTemperature),
       secondaryLLMStripHTML: sanitizeBool(parsed.secondaryLLMStripHTML, DEFAULT_CONFIG.secondaryLLMStripHTML),
+      fertilityCycleBias: sanitizeFertilityCycleBias(parsed.fertilityCycleBias),
     };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
@@ -1968,6 +1996,57 @@ async function generateTrackerWithSecondaryLLM(chatId: string, targetMessageId: 
   }
 }
 
+/**
+ * Map a fertility-cycle bias to a concrete day + human-readable stage
+ * description for the initial-state hint injected into a brand-new chat.
+ *
+ * The day ranges assume a standard ~28-day cycle and line up with the
+ * stage taxonomy used by the frontend's `FERTILITY_STAGE_BY_ID` map
+ * (menstruation → follicular → ovulation → luteal). Each bias rolls a
+ * random day inside its window so chats don't all land on the exact same
+ * number, while still respecting the user's chosen phase.
+ */
+function pickInitialCycleState(bias: FertilityCycleBias): { day: number; description: string } {
+  const roll = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+  switch (bias) {
+    case "menstruating": {
+      const day = roll(1, 5);
+      return { day, description: `menstruating (cycle_stage_id 1)` };
+    }
+    case "start_follicular": {
+      const day = roll(6, 10);
+      return { day, description: `in the early follicular phase (cycle_stage_id 2)` };
+    }
+    case "close_ovulation": {
+      const day = roll(11, 13);
+      return { day, description: `late in the follicular phase, approaching ovulation (cycle_stage_id 2)` };
+    }
+    case "ovulating": {
+      const day = roll(14, 16);
+      return { day, description: `ovulating (cycle_stage_id 3)` };
+    }
+    case "start_luteal": {
+      const day = roll(17, 21);
+      return { day, description: `in the early luteal phase (cycle_stage_id 4)` };
+    }
+    case "end_luteal": {
+      const day = roll(24, 28);
+      return { day, description: `late in the luteal phase, pre-menstrual (cycle_stage_id 4)` };
+    }
+    case "random":
+    default: {
+      const day = roll(1, 28);
+      return { day, description: "" };
+    }
+  }
+}
+
+function buildFirstMessageHint(bias: FertilityCycleBias): string {
+  const { day, description } = pickInitialCycleState(bias);
+  const qualifier = description ? `, ${description}` : "";
+  return `\n\nINITIAL STATE: Female and Futanari characters begin on day ${day} of their fertility cycle already${qualifier}. Reflect this in the first tracker.`;
+}
+
 // `GENERATION_STARTED` fires immediately before the interceptor runs and
 // reliably carries the active chat id in its typed payload. Mirror it into
 // `activeChatId` so the interceptor can fall back on it when its `context`
@@ -1985,7 +2064,8 @@ spindle.on("GENERATION_STARTED", (payload: unknown, userId?: string) => {
     await rehydrateChatTrackerHistory(chatId);
 
     // Brand-new chat: exactly one user message and no tracker history yet.
-    // Seed a random cycle day so models don't cluster on the same position.
+    // Seed a cycle day (biased by the user's setting) so models don't
+    // cluster on the same fertility position on every fresh chat.
     const previousHint = firstMessageHint;
     firstMessageHint = "";
     try {
@@ -1995,8 +2075,7 @@ spindle.on("GENERATION_STARTED", (payload: unknown, userId?: string) => {
           return msgs.filter((m) => m.role === "user").length === 1;
         })();
       if (isNewChat) {
-        const cycleDay = 1 + Math.floor(Math.random() * 28);
-        firstMessageHint = `\n\nINITIAL STATE: Female and Futanari characters begin on day ${cycleDay} of their fertility cycle already. Reflect this in the first tracker.`;
+        firstMessageHint = buildFirstMessageHint(config.fertilityCycleBias);
       }
     } catch {
       // If message introspection fails, leave the hint empty.
@@ -2639,6 +2718,7 @@ spindle.onFrontendMessage(async (payload: unknown, userId: string) => {
         secondaryLLMMessageCount: sanitizeMessageCount(incoming?.secondaryLLMMessageCount ?? config.secondaryLLMMessageCount),
         secondaryLLMTemperature: sanitizeTemperature(incoming?.secondaryLLMTemperature ?? config.secondaryLLMTemperature),
         secondaryLLMStripHTML: sanitizeBool(incoming?.secondaryLLMStripHTML ?? config.secondaryLLMStripHTML, config.secondaryLLMStripHTML),
+        fertilityCycleBias: sanitizeFertilityCycleBias(incoming?.fertilityCycleBias ?? config.fertilityCycleBias),
       };
       await saveConfig(userId);
       pushMacroValues();
