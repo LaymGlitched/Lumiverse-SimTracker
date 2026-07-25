@@ -11283,7 +11283,7 @@ var config = { ...DEFAULT_CONFIG };
 var lastSimStats = "{}";
 var activeUserId = null;
 var loadedConfigUserId = null;
-var firstMessageHint = "";
+var activeSimTrackerMacroContent = "";
 var activeChatId = null;
 var chatTrackerHistory = new Map;
 var rehydratedChats = new Set;
@@ -12455,7 +12455,8 @@ function pushMacroValues() {
 ` + base.replace(/\{\{sim_format\}\}/g, fmt) : directive + `
 
 ` + fmt;
-  spindle.updateMacroValue("sim_tracker", simTracker + firstMessageHint);
+  activeSimTrackerMacroContent = simTracker;
+  spindle.updateMacroValue("sim_tracker", simTracker);
   spindle.updateMacroValue("last_sim_stats", lastSimStats || "{}");
 }
 var secondaryGenerationChain = Promise.resolve();
@@ -12715,10 +12716,10 @@ function pickInitialCycleState(bias) {
 }
 function buildFirstMessageHint(bias) {
   const { day, description } = pickInitialCycleState(bias);
+  if (!description && bias !== "random")
+    return "";
   const qualifier = description ? `, ${description}` : "";
-  return `
-
-INITIAL STATE: Female and Futanari characters begin on day ${day} of their fertility cycle already${qualifier}. Reflect this in the first tracker.`;
+  return `INITIAL STATE: Female and Futanari characters begin on day ${day} of their fertility cycle already${qualifier}. Reflect this in the first tracker.`;
 }
 spindle.on("GENERATION_STARTED", (payload, userId) => {
   (async () => {
@@ -12731,19 +12732,6 @@ spindle.on("GENERATION_STARTED", (payload, userId) => {
       return;
     activeChatId = chatId;
     await rehydrateChatTrackerHistory(chatId);
-    const previousHint = firstMessageHint;
-    firstMessageHint = "";
-    try {
-      const isNewChat = getChatTrackerHistory(chatId).length === 0 && await (async () => {
-        const msgs = await spindle.chat.getMessages(chatId);
-        return msgs.filter((m) => m.role === "user").length === 1;
-      })();
-      if (isNewChat) {
-        firstMessageHint = buildFirstMessageHint(config.fertilityCycleBias);
-      }
-    } catch {}
-    if (previousHint !== firstMessageHint)
-      pushMacroValues();
   })();
 });
 spindle.on("CHAT_SWITCHED", (payload, userId) => {
@@ -13014,8 +13002,27 @@ function tryRegisterInterceptor() {
       }
       const conceptionDirective = buildConceptionDirective(conceptionNames);
       const history = getRecentChatTrackers(chatId, keepNewest);
-      if (history.length === 0)
+      if (history.length === 0) {
+        const userMsgCount = retained.filter((m) => m && m.role === "user").length;
+        if (userMsgCount === 1) {
+          const hint = buildFirstMessageHint(config.fertilityCycleBias);
+          if (hint && activeSimTrackerMacroContent) {
+            for (let i = retained.length - 1;i >= 0; i--) {
+              const m = retained[i];
+              if (m && m.role === "system" && typeof m.content === "string" && m.content.includes(activeSimTrackerMacroContent)) {
+                retained[i] = {
+                  ...m,
+                  content: m.content.replace(activeSimTrackerMacroContent, activeSimTrackerMacroContent + `
+
+` + hint)
+                };
+                break;
+              }
+            }
+          }
+        }
         return retained;
+      }
       const existingPayloads = new Set;
       for (const msg of retained) {
         if (!msg || typeof msg.content !== "string")

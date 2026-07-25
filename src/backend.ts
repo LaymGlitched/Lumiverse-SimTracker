@@ -66,14 +66,8 @@ let config: TrackerConfig = { ...DEFAULT_CONFIG };
 let lastSimStats = "{}";
 let activeUserId: string | null = null;
 let loadedConfigUserId: string | null = null;
-/**
- * One-shot seed hint injected into the `sim_tracker` macro on a brand-new
- * chat (exactly one user message, no tracker history yet). Models otherwise
- * gravitate toward the same handful of cycle days on a fresh start; this
- * picks a random day per chat to spread the distribution. Cleared on any
- * subsequent generation.
- */
-let firstMessageHint = "";
+let activeSimTrackerMacroContent = "";
+
 /**
  * Last chat id the extension saw activity on. The interceptor signature
  * (`context: unknown`) doesn't contractually expose the chat id, so we
@@ -1701,7 +1695,8 @@ function pushMacroValues(): void {
   const simTracker = base
     ? directive + "\n\n" + base.replace(/\{\{sim_format\}\}/g, fmt)
     : directive + "\n\n" + fmt;
-  spindle.updateMacroValue("sim_tracker", simTracker + firstMessageHint);
+  activeSimTrackerMacroContent = simTracker;
+  spindle.updateMacroValue("sim_tracker", simTracker);
 
   // last_sim_stats
   spindle.updateMacroValue("last_sim_stats", lastSimStats || "{}");
@@ -2043,8 +2038,9 @@ function pickInitialCycleState(bias: FertilityCycleBias): { day: number; descrip
 
 function buildFirstMessageHint(bias: FertilityCycleBias): string {
   const { day, description } = pickInitialCycleState(bias);
+  if (!description && bias !== "random") return "";
   const qualifier = description ? `, ${description}` : "";
-  return `\n\nINITIAL STATE: Female and Futanari characters begin on day ${day} of their fertility cycle already${qualifier}. Reflect this in the first tracker.`;
+  return `INITIAL STATE: Female and Futanari characters begin on day ${day} of their fertility cycle already${qualifier}. Reflect this in the first tracker.`;
 }
 
 // `GENERATION_STARTED` fires immediately before the interceptor runs and
@@ -2062,25 +2058,6 @@ spindle.on("GENERATION_STARTED", (payload: unknown, userId?: string) => {
     if (!chatId) return;
     activeChatId = chatId;
     await rehydrateChatTrackerHistory(chatId);
-
-    // Brand-new chat: exactly one user message and no tracker history yet.
-    // Seed a cycle day (biased by the user's setting) so models don't
-    // cluster on the same fertility position on every fresh chat.
-    const previousHint = firstMessageHint;
-    firstMessageHint = "";
-    try {
-      const isNewChat = getChatTrackerHistory(chatId).length === 0
-        && await (async () => {
-          const msgs = await spindle.chat.getMessages(chatId);
-          return msgs.filter((m) => m.role === "user").length === 1;
-        })();
-      if (isNewChat) {
-        firstMessageHint = buildFirstMessageHint(config.fertilityCycleBias);
-      }
-    } catch {
-      // If message introspection fails, leave the hint empty.
-    }
-    if (previousHint !== firstMessageHint) pushMacroValues();
   })();
 });
 
@@ -2446,7 +2423,28 @@ function tryRegisterInterceptor(): void {
       // Fetch the most recent entries (post-mutation); we may discard
       // duplicates already represented in the assembled prompt.
       const history = getRecentChatTrackers(chatId, keepNewest);
-      if (history.length === 0) return retained;
+      if (history.length === 0) {
+        // If there is no tracker history yet, and this is the very first user
+        // message of the chat, inject a one-shot seed hint so models don't
+        // cluster on the same fertility position on every fresh chat.
+        const userMsgCount = retained.filter((m) => m && m.role === "user").length;
+        if (userMsgCount === 1) {
+          const hint = buildFirstMessageHint(config.fertilityCycleBias);
+          if (hint && activeSimTrackerMacroContent) {
+            for (let i = retained.length - 1; i >= 0; i--) {
+              const m = retained[i];
+              if (m && m.role === "system" && typeof m.content === "string" && m.content.includes(activeSimTrackerMacroContent)) {
+                retained[i] = {
+                  ...m,
+                  content: m.content.replace(activeSimTrackerMacroContent, activeSimTrackerMacroContent + "\n\n" + hint),
+                };
+                break;
+              }
+            }
+          }
+        }
+        return retained;
+      }
 
       const existingPayloads = new Set<string>();
       for (const msg of retained) {
