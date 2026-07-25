@@ -11273,6 +11273,7 @@ var config = { ...DEFAULT_CONFIG };
 var lastSimStats = "{}";
 var activeUserId = null;
 var loadedConfigUserId = null;
+var firstMessageHint = "";
 var activeChatId = null;
 var chatTrackerHistory = new Map;
 var rehydratedChats = new Set;
@@ -12440,7 +12441,7 @@ function pushMacroValues() {
 ` + base.replace(/\{\{sim_format\}\}/g, fmt) : directive + `
 
 ` + fmt;
-  spindle.updateMacroValue("sim_tracker", simTracker);
+  spindle.updateMacroValue("sim_tracker", simTracker + firstMessageHint);
   spindle.updateMacroValue("last_sim_stats", lastSimStats || "{}");
 }
 var secondaryGenerationChain = Promise.resolve();
@@ -12675,6 +12676,22 @@ spindle.on("GENERATION_STARTED", (payload, userId) => {
       return;
     activeChatId = chatId;
     await rehydrateChatTrackerHistory(chatId);
+    const previousHint = firstMessageHint;
+    firstMessageHint = "";
+    try {
+      const isNewChat = getChatTrackerHistory(chatId).length === 0 && await (async () => {
+        const msgs = await spindle.chat.getMessages(chatId);
+        return msgs.filter((m) => m.role === "user").length === 1;
+      })();
+      if (isNewChat) {
+        const cycleDay = 1 + Math.floor(Math.random() * 28);
+        firstMessageHint = `
+
+INITIAL STATE: Female and Futanari characters begin on day ${cycleDay} of their fertility cycle already. Reflect this in the first tracker.`;
+      }
+    } catch {}
+    if (previousHint !== firstMessageHint)
+      pushMacroValues();
   })();
 });
 spindle.on("CHAT_SWITCHED", (payload, userId) => {

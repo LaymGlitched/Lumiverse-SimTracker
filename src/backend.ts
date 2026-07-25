@@ -46,6 +46,14 @@ let lastSimStats = "{}";
 let activeUserId: string | null = null;
 let loadedConfigUserId: string | null = null;
 /**
+ * One-shot seed hint injected into the `sim_tracker` macro on a brand-new
+ * chat (exactly one user message, no tracker history yet). Models otherwise
+ * gravitate toward the same handful of cycle days on a fresh start; this
+ * picks a random day per chat to spread the distribution. Cleared on any
+ * subsequent generation.
+ */
+let firstMessageHint = "";
+/**
  * Last chat id the extension saw activity on. The interceptor signature
  * (`context: unknown`) doesn't contractually expose the chat id, so we
  * mirror it from `GENERATION_STARTED` (which does carry it) and from
@@ -1665,7 +1673,7 @@ function pushMacroValues(): void {
   const simTracker = base
     ? directive + "\n\n" + base.replace(/\{\{sim_format\}\}/g, fmt)
     : directive + "\n\n" + fmt;
-  spindle.updateMacroValue("sim_tracker", simTracker);
+  spindle.updateMacroValue("sim_tracker", simTracker + firstMessageHint);
 
   // last_sim_stats
   spindle.updateMacroValue("last_sim_stats", lastSimStats || "{}");
@@ -1975,6 +1983,25 @@ spindle.on("GENERATION_STARTED", (payload: unknown, userId?: string) => {
     if (!chatId) return;
     activeChatId = chatId;
     await rehydrateChatTrackerHistory(chatId);
+
+    // Brand-new chat: exactly one user message and no tracker history yet.
+    // Seed a random cycle day so models don't cluster on the same position.
+    const previousHint = firstMessageHint;
+    firstMessageHint = "";
+    try {
+      const isNewChat = getChatTrackerHistory(chatId).length === 0
+        && await (async () => {
+          const msgs = await spindle.chat.getMessages(chatId);
+          return msgs.filter((m) => m.role === "user").length === 1;
+        })();
+      if (isNewChat) {
+        const cycleDay = 1 + Math.floor(Math.random() * 28);
+        firstMessageHint = `\n\nINITIAL STATE: Female and Futanari characters begin on day ${cycleDay} of their fertility cycle already. Reflect this in the first tracker.`;
+      }
+    } catch {
+      // If message introspection fails, leave the hint empty.
+    }
+    if (previousHint !== firstMessageHint) pushMacroValues();
   })();
 });
 
