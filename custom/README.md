@@ -209,6 +209,7 @@ Both `E69F00` and `#E69F00` color forms are accepted. JSON and YAML payloads are
 To use the simtracker, this is the prompt and COT addition that has worked for me:
 
 ```xml
+{{deletevar::tracker_instructions}}
 {{if {{sim_tracker}} }}{{trim}}
 <tracker_instructions>
 {{sim_tracker}}
