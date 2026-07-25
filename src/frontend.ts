@@ -1,6 +1,6 @@
 import Handlebars from "handlebars";
 import type { SpindleFrontendContext, SpindleModelComboboxHandle } from "lumiverse-spindle-types";
-import { getTemplatePresets, type TemplatePreset } from "./templatePresets";
+import { getTemplatePresets, mergeTemplatePresets, type TemplatePreset } from "./templatePresets";
 import { parseTrackerBlock, type TrackerData } from "./trackerData";
 import { createInlineTemplateProcessor } from "./inlineTemplates";
 
@@ -57,6 +57,65 @@ let runtimeSeededPresets: TemplatePreset[] = [];
 const TEMPLATE_CACHE = new Map<string, Handlebars.TemplateDelegate>();
 let helpersRegistered = false;
 let panelRoot: Element | null = null;
+const READY_MIN_VERSION = [1, 0, 6] as const;
+
+function parseVersionSegment(segment: string | undefined): number {
+  if (!segment) return 0;
+  const match = segment.match(/\d+/);
+  return match ? Number(match[0]) : 0;
+}
+
+function isVersionAtLeast(version: string, minimum: readonly number[]): boolean {
+  const parts = version.split(".");
+  for (let index = 0; index < minimum.length; index += 1) {
+    const current = parseVersionSegment(parts[index]);
+    const required = minimum[index];
+    if (current > required) return true;
+    if (current < required) return false;
+  }
+  return true;
+}
+
+async function shouldBroadcastReadyForHost(): Promise<boolean> {
+  try {
+    const response = await fetch("/api/v1/system/info", { credentials: "same-origin" });
+    if (!response.ok) return true;
+    const payload = await response.json() as { backend?: { version?: unknown } };
+    const version = typeof payload?.backend?.version === "string" ? payload.backend.version : null;
+    return version ? isVersionAtLeast(version, READY_MIN_VERSION) : true;
+  } catch {
+    return true;
+  }
+}
+
+function createReadyGate(ctx: SpindleFrontendContext) {
+  if (typeof ctx.deferReady !== "function" || typeof ctx.ready !== "function") {
+    return {
+      dispose() {},
+      release() {},
+    };
+  }
+
+  ctx.deferReady();
+  const shouldBroadcastReady = shouldBroadcastReadyForHost();
+  let disposed = false;
+  let released = false;
+
+  return {
+    dispose() {
+      disposed = true;
+    },
+    release() {
+      if (disposed || released) return;
+      released = true;
+      void shouldBroadcastReady.then((allowed) => {
+        if (!disposed && allowed) {
+          ctx.ready();
+        }
+      });
+    },
+  };
+}
 
 const FERTILITY_STAGE_BY_ID: Record<number, string> = {
   1: "menstruation",
@@ -507,11 +566,15 @@ function byId<T extends Element>(id: string): T | null {
   return document.getElementById(id) as T | null;
 }
 
+const DEFAULT_PANEL_STATUS = "Waiting for tracker tag...";
+const LOADING_CONFIG_STATUS = "Loading config...";
+const CONFIG_ERROR_STATUS_PREFIX = "Config load failed:";
+
 const PANEL_HTML = `
   <section id="sst-lumi-panel" class="sst-lumi-panel">
     <header class="sst-lumi-header">
       <h3>Silly Sim Tracker</h3>
-      <span class="sst-lumi-status" id="sst-lumi-status">Waiting for tracker tag...</span>
+      <span class="sst-lumi-status" id="sst-lumi-status">${DEFAULT_PANEL_STATUS}</span>
     </header>
     <div class="sst-lumi-controls">
       <label>Template<select id="sst-lumi-template"></select></label>
@@ -522,7 +585,7 @@ const PANEL_HTML = `
       <label class="sst-lumi-checkbox"><input id="sst-lumi-inline" type="checkbox" />Enable inline displays</label>
       <label class="sst-lumi-checkbox"><input id="sst-lumi-hide" type="checkbox" checked />Hide tracker tags in chat</label>
       <div class="sst-lumi-actions">
-        <button id="sst-lumi-save" type="button">Save</button>
+        <button id="sst-lumi-save" type="button">Save Settings</button>
         <button id="sst-lumi-export" type="button">Export Preset</button>
         <button id="sst-lumi-import" type="button">Import Preset</button>
       </div>
@@ -650,7 +713,7 @@ function sanitizeSecondaryLLMModel(value: unknown): string {
 }
 
 function getAllPresets(config: TrackerConfig): TemplatePreset[] {
-  return [...BUILTIN_PRESETS, ...runtimeSeededPresets, ...config.userPresets];
+  return mergeTemplatePresets(BUILTIN_PRESETS, runtimeSeededPresets, config.userPresets);
 }
 
 function getPresetById(config: TrackerConfig, id: string): TemplatePreset {
@@ -734,6 +797,11 @@ function resolveTrackerMountMode(preset: TemplatePreset): TrackerMountMode {
 function setStatus(text: string): void {
   const el = byId<HTMLElement>("sst-lumi-status");
   if (el) el.textContent = text;
+}
+
+function shouldResetStatusAfterConfigLoad(): boolean {
+  const text = byId<HTMLElement>("sst-lumi-status")?.textContent?.trim() || "";
+  return !text || text === LOADING_CONFIG_STATUS || text.startsWith(CONFIG_ERROR_STATUS_PREFIX);
 }
 
 function renderCapabilities(
@@ -1322,6 +1390,9 @@ function downloadJson(filename: string, content: unknown): void {
 }
 
 export function setup(ctx: SpindleFrontendContext) {
+  // Lumiverse 1.0.6+ can explicitly release queued startup events once the
+  // frontend has registered its handlers and issued its initial requests.
+  const readyGate = createReadyGate(ctx);
   registerTemplateHelpers();
   ctx.dom.cleanup();
 
@@ -1344,8 +1415,11 @@ export function setup(ctx: SpindleFrontendContext) {
     previousData: TrackerData | null;
     mode: TrackerMountMode;
   };
+  type LatestMessageRenderIntent = TrackerRenderInputs & { messageId: string };
   const trackerMessageRenders = new Map<string, TrackerRenderInputs>();
   const trackerGeneratingIndicators = new Map<string, Element>();
+  let latestMessageRenderIntent: LatestMessageRenderIntent | null = null;
+  let pendingGeneratingIndicatorMessageId: string | null = null;
   const inlineProcessor = createInlineTemplateProcessor({
     getConfig: () => ({
       enableInlineTemplates: config.enableInlineTemplates,
@@ -1617,6 +1691,25 @@ export function setup(ctx: SpindleFrontendContext) {
     updateRegenerateButton();
   };
 
+  const clearLatestMessageRenderIntent = (messageId?: string | null) => {
+    if (!latestMessageRenderIntent) return;
+    if (messageId && latestMessageRenderIntent.messageId !== messageId) return;
+    latestMessageRenderIntent = null;
+  };
+
+  const retryLatestMessageRenderIntent = (messageId: string | null) => {
+    if (!messageId || !latestMessageRenderIntent || latestMessageRenderIntent.messageId !== messageId) return;
+    if (latestMessageRenderIntent.mode === "side_left" || latestMessageRenderIntent.mode === "side_right") return;
+    renderTrackerIntoMessage(
+      latestMessageRenderIntent.messageId,
+      latestMessageRenderIntent.data,
+      latestMessageRenderIntent.preset,
+      latestMessageRenderIntent.previousData,
+      latestMessageRenderIntent.mode,
+    );
+    pruneNonLatestMessageTrackers();
+  };
+
   const clearSideTrackerRender = () => {
     if (sideTrackerMount) {
       sideTrackerMount.remove();
@@ -1739,6 +1832,7 @@ export function setup(ctx: SpindleFrontendContext) {
     // Tag interceptor flag `removeFromMessage` already strips the existing
     // tracker tag from the bubble before we inject, so the indicator slots
     // into the same vertical space the new tracker will land in.
+    pendingGeneratingIndicatorMessageId = messageId;
     const existing = trackerGeneratingIndicators.get(messageId);
     if (existing && existing.isConnected) return;
     const messageNode = ctx.dom.findMessageElement(messageId);
@@ -1753,6 +1847,9 @@ export function setup(ctx: SpindleFrontendContext) {
   };
 
   const hideGeneratingIndicator = (messageId: string) => {
+    if (pendingGeneratingIndicatorMessageId === messageId) {
+      pendingGeneratingIndicatorMessageId = null;
+    }
     const mount = trackerGeneratingIndicators.get(messageId);
     if (mount) ctx.dom.uninject(mount);
     trackerGeneratingIndicators.delete(messageId);
@@ -1761,6 +1858,12 @@ export function setup(ctx: SpindleFrontendContext) {
   const hideAllGeneratingIndicators = () => {
     for (const [, mount] of trackerGeneratingIndicators) ctx.dom.uninject(mount);
     trackerGeneratingIndicators.clear();
+    pendingGeneratingIndicatorMessageId = null;
+  };
+
+  const retryGeneratingIndicator = (messageId: string | null) => {
+    if (!messageId || pendingGeneratingIndicatorMessageId !== messageId) return;
+    showGeneratingIndicator(messageId);
   };
 
   // Cheap deep-equality stable enough for tracker payloads (plain JSON shape).
@@ -1849,7 +1952,10 @@ export function setup(ctx: SpindleFrontendContext) {
     if (!parsed) {
       setStatus("Tracker found (invalid JSON/YAML)");
       renderEmpty(raw);
-      if (messageId) clearMessageTrackerRender(messageId);
+      if (messageId) {
+        clearLatestMessageRenderIntent(messageId);
+        clearMessageTrackerRender(messageId);
+      }
       return;
     }
     latestTrackerRaw = raw;
@@ -1869,9 +1975,17 @@ export function setup(ctx: SpindleFrontendContext) {
     // Re-applications of an already-mounted tracker (config reload,
     // template switch) must now pass the messageId explicitly.
     if (mountMode === "side_left" || mountMode === "side_right") {
+      clearLatestMessageRenderIntent();
       renderTrackerInSidebar(parsed, preset, previousTrackerData, mountMode);
       if (messageId) clearMessageTrackerRender(messageId);
     } else if (messageId) {
+      latestMessageRenderIntent = {
+        messageId,
+        data: parsed,
+        preset,
+        previousData: previousTrackerData,
+        mode: mountMode,
+      };
       clearSideTrackerRender();
       renderTrackerIntoMessage(messageId, parsed, preset, previousTrackerData, mountMode);
       pruneNonLatestMessageTrackers();
@@ -1887,6 +2001,7 @@ export function setup(ctx: SpindleFrontendContext) {
       let wasLatest = false;
       if (messageId && trackerMessageIds.has(messageId)) {
         trackerMessageIds.delete(messageId);
+        clearLatestMessageRenderIntent(messageId);
         clearMessageTrackerRender(messageId);
         if (latestTrackerMessageId === messageId) {
           latestTrackerMessageId = null;
@@ -1938,6 +2053,16 @@ export function setup(ctx: SpindleFrontendContext) {
       setStatus(message);
       return;
     }
+    if (obj?.type === "config_error") {
+      const message = typeof obj.message === "string" && obj.message.trim() ? obj.message.trim() : "Unknown error";
+      const operation = obj.operation === "save" ? "Config save failed:" : CONFIG_ERROR_STATUS_PREFIX;
+      setStatus(`${operation} ${message}`);
+      return;
+    }
+    if (obj?.type === "config_saved") {
+      setStatus("Settings saved");
+      return;
+    }
     if (obj?.type === "connections_list" && Array.isArray(obj.connections)) {
       connections = obj.connections as ConnectionProfile[];
       populateConnectionDropdown();
@@ -1976,10 +2101,10 @@ export function setup(ctx: SpindleFrontendContext) {
       if (entry && typeof entry.payload === "string" && entry.payload.trim()) {
         const msgId = typeof entry.messageId === "string" ? entry.messageId : null;
         // Hydration safety net: only useful when the latest tracker-bearing
-        // message was virtualized out at chat-open time so the post-switch
-        // DOM scan couldn't find it. If we already rendered for that
-        // messageId, skip — otherwise we'd flash the message-level render
-        // with `previousData` now equal to the latest data (no diffs).
+        // message wasn't reprocessed through a live frontend event yet. If
+        // we already handled that messageId, skip — otherwise we'd flash the
+        // message-level render with `previousData` now equal to the latest
+        // data (no diffs).
         if (msgId && trackerMessageIds.has(msgId)) return;
         handleTrackerPayload(entry.payload, entry.payload, msgId);
       }
@@ -2049,6 +2174,9 @@ export function setup(ctx: SpindleFrontendContext) {
       pendingTrackerPayload = null;
       handleTrackerPayload(pending.raw, pending.sourceContent, pending.messageId);
     }
+    if (shouldResetStatusAfterConfigLoad()) {
+      setStatus(DEFAULT_PANEL_STATUS);
+    }
     requestInitialTrackerRehydrate();
     inlineProcessor.processAll();
   });
@@ -2078,9 +2206,9 @@ export function setup(ctx: SpindleFrontendContext) {
       rehydratedChatIds.add(chatId);
       ctx.sendToBackend({ type: "get_latest_tracker", chatId });
     }
-    // Wait two frames for Lumiverse to finish painting the new chat's messages before scanning.
+    // Wait two frames for Lumiverse to finish painting the new chat's
+    // messages before running the inline-template sweep.
     requestAnimationFrame(() => requestAnimationFrame(() => {
-      renderTrackersFromDOM();
       inlineProcessor.processAll();
     }));
   };
@@ -2113,6 +2241,7 @@ export function setup(ctx: SpindleFrontendContext) {
     latestTrackerRaw = null;
     latestTrackerSourceContent = null;
     latestContent = null;
+    latestMessageRenderIntent = null;
 
     // If the swiped-to message already has content (historical), process it now.
     if (context.content) {
@@ -2125,6 +2254,17 @@ export function setup(ctx: SpindleFrontendContext) {
     handleChatSwitch(extractChatId(payload));
     const context = readMessageContext(payload);
     if (!context || context.isUser === true) return;
+    retryLatestMessageRenderIntent(context.messageId);
+    retryGeneratingIndicator(context.messageId);
+    const latestMountedId = ctx.messages.getLatestMessageId();
+    const needsLatestAttach =
+      !!context.messageId &&
+      context.messageId === latestMountedId &&
+      latestMessageRenderIntent?.messageId !== context.messageId &&
+      !trackerMessageRenders.has(context.messageId);
+    if (needsLatestAttach && context.content) {
+      handleContent(context.content, context.messageId);
+    }
     runInlinePass(context.messageId);
   };
 
@@ -2136,6 +2276,7 @@ export function setup(ctx: SpindleFrontendContext) {
     // regenerate button and the side panel don't reference a ghost.
     if (trackerMessageIds.has(context.messageId)) {
       trackerMessageIds.delete(context.messageId);
+      clearLatestMessageRenderIntent(context.messageId);
       clearMessageTrackerRender(context.messageId);
     }
     hideGeneratingIndicator(context.messageId);
@@ -2153,24 +2294,12 @@ export function setup(ctx: SpindleFrontendContext) {
     // side-channel entry, so no frontend → backend bridge needed here.
   };
 
-  const renderTrackersFromDOM = () => {
-    const messageNodes = Array.from(document.querySelectorAll("[data-message-id]"));
-    for (const msgNode of messageNodes) {
-      const msgId = msgNode.getAttribute("data-message-id");
-      if (!msgId) continue;
-      const preSel = `pre[data-code-lang="${config.codeBlockIdentifier}"]`;
-      const preBlock = msgNode.querySelector(preSel);
-      const raw = preBlock?.textContent?.trim() || "";
-      if (raw) handleTrackerPayload(raw, raw, msgId);
-    }
-  };
-
   // Virtualization replay is handled host-side: the wrapper returned by
   // ctx.dom.inject() is preserved across scroll-away/scroll-back and moved
   // back into the remounted bubble with its identity, form state, and
-  // listeners intact. See lumiverse-spindle-types/dom.ts (>=0.5.13) for the
-  // full contract. We just inject once per render-input change and trust
-  // the host to keep it attached.
+  // listeners intact. We keep the latest render intent around so
+  // CHARACTER_MESSAGE_RENDERED can finish the first attach as soon as the
+  // newest bubble mounts, then trust the host to keep it attached.
 
   const resetChatState = () => {
     previousTrackerData = null;
@@ -2178,6 +2307,7 @@ export function setup(ctx: SpindleFrontendContext) {
     latestTrackerRaw = null;
     latestTrackerSourceContent = null;
     latestContent = null;
+    latestMessageRenderIntent = null;
     trackerMessageIds.clear();
     updateRegenerateButton();
     for (const mount of trackerMessageMounts.values()) ctx.dom.uninject(mount);
@@ -2241,7 +2371,7 @@ export function setup(ctx: SpindleFrontendContext) {
       handleTrackerPayload(latestTrackerRaw, latestTrackerSourceContent || latestTrackerRaw, latestTrackerMessageId);
     }
     inlineProcessor.processAll();
-    setStatus(`Previewing template: ${preset.templateName}`);
+    setStatus(`Previewing template: ${preset.templateName}. Click Save Settings to keep it.`);
   });
 
   saveButton?.addEventListener("click", () => {
@@ -2283,7 +2413,7 @@ export function setup(ctx: SpindleFrontendContext) {
     configTrackerTagNameHint = config.trackerTagName;
     applyTagInterceptor();
     inlineProcessor.processAll();
-    setStatus("Config saved");
+    setStatus("Saving settings...");
   });
 
   const exportButton = byId<HTMLElement>("sst-lumi-export");
@@ -2359,7 +2489,7 @@ export function setup(ctx: SpindleFrontendContext) {
   ctx.sendToBackend({ type: "get_config" });
   ctx.sendToBackend({ type: "get_connections" });
   updatePermissionGatedControls();
-  setStatus("Loading config...");
+  setStatus(LOADING_CONFIG_STATUS);
   renderEmpty("When a message includes a tracker tag, cards will appear here.");
 
   // Retry config request after a short delay in case the backend is still
@@ -2375,8 +2505,10 @@ export function setup(ctx: SpindleFrontendContext) {
     }, 2000);
   };
   scheduleConfigRetry();
+  readyGate.release();
 
   return () => {
+    readyGate.dispose();
     panelRoot = null;
     if (modelCombobox) {
       modelCombobox.destroy();
